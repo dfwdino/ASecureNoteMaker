@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-public class FileEncryptor
+public class FilEncryption
 {
     public static void EncryptFile(string text, string outputFilePath, string passphrase)
     {

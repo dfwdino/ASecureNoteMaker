@@ -7,11 +7,11 @@
     Shell.FlyoutBehavior="Disabled"
     Title="ASecureNoteMaker">
 
-
+    
 
 
         <ShellContent
-        Title="A Secure Note"
+        Title=""
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 

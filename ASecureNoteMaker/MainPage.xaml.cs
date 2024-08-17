@@ -24,12 +24,13 @@ namespace ASecureNoteMaker
                 passphrase =  result;
             }
 
-            Note.Text = FileEncryptor.DecryptFile(encryptedFilePath, passphrase);
+            Note.Text = FilEncryption.DecryptFile(encryptedFilePath, passphrase);
         }
 
         private void SaveText_Clicked(object sender, EventArgs e)
         {
-            FileEncryptor.EncryptFile(Note.Text,encryptedFilePath, passphrase);
+            FilEncryption.EncryptFile(Note.Text,encryptedFilePath, passphrase);
+            MainPageStatus.Text = $"Note Saved in {encryptedFilePath}";
         }
     }
 
