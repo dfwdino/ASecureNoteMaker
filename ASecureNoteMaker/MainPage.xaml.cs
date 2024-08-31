@@ -21,9 +21,11 @@ namespace ASecureNoteMaker
         private IDispatcherTimer autoSaveTimer;
 
 
+
         public MainPage()
         {
             InitializeComponent();
+            //encryptedFilePath = String.Empty;
             this.Loaded += OnPageLoaded;
         }
 
@@ -47,13 +49,19 @@ namespace ASecureNoteMaker
         private async void OnPageLoaded(object sender, EventArgs e)
         {
             string result = await DisplayPromptAsync("Input", "Please enter some text:");
+
             if (!string.IsNullOrEmpty(result))
             {
                 passphrase = result;
             }
 
-            Note.Text = FilEncryption.DecryptFile(encryptedFilePath, passphrase);
-        }
+            if (!encryptedFilePath.Equals(string.Empty))
+            {
+                using var stream = new MemoryStream(Encoding.Default.GetBytes(Note.Text));
+
+                var encryptedFilePath = await FileSaver.Default.SaveAsync(null, stream, CancellationToken.None);
+
+            }
 
         private void SaveText_Clicked(object sender, EventArgs e)
         {
