@@ -55,6 +55,8 @@ public class FilEncryption
         }
     }
 
+
+
     private static (byte[] Key, byte[] IV) DeriveKeyAndIV(string passphrase, byte[] salt, int keySize, int ivSize)
     {
         using (var rfc2898 = new Rfc2898DeriveBytes(passphrase, salt, 100000))

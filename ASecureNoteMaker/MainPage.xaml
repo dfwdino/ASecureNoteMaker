@@ -7,10 +7,10 @@
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="File">
             <MenuFlyoutItem Text="New File"
-                            Command="{Binding ExitCommand}" />
+                            Clicked="NewFile_Clicked" />
 
             <MenuFlyoutItem Text="Load File"
-                            Command="{Binding ExitCommand}" />
+                            Clicked="OpenFile_Clicked" />
 
            
 
@@ -27,7 +27,7 @@
             </MenuFlyoutSubItem>
 
             <MenuFlyoutItem Text="Exit"
-                 Command="{Binding ExitCommand}" />
+                 Clicked="Exit_Clicked" />
             
             
         </MenuBarItem>
@@ -52,7 +52,7 @@
         <Editor x:Name="Note" Text="" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" 
                     Placeholder="Text goes here." HeightRequest="500" WidthRequest="500"/>
         <Button Text="Save" Clicked="SaveText_Clicked" HeightRequest="50" WidthRequest="100"/>
-        <CheckBox x:Name="AutoSave"></CheckBox><Label Text="AutoSave"></Label>
+        <CheckBox x:Name="AutoSave" CheckedChanged="AutoSave_CheckedChanged"></CheckBox><Label Text="AutoSave"></Label>
         <Label x:Name="MainPageStatus" Text="" HorizontalOptions="Center" VerticalOptions="End" />
     </StackLayout>
 
