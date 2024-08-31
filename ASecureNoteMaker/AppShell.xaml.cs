@@ -1,4 +1,6 @@
-﻿namespace ASecureNoteMaker
+﻿using Microsoft.Maui.Controls.PlatformConfiguration;
+
+namespace ASecureNoteMaker
 {
     public partial class AppShell : Shell
     {
@@ -7,6 +9,7 @@
             InitializeComponent();
         }
 
-    
+        
+
     }
 }

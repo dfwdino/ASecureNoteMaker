@@ -1,5 +1,7 @@
 ﻿using ASecureNoteMaker.Extensions;
 using CommunityToolkit.Maui.Storage;
+using System.Text;
+
 
 namespace ASecureNoteMaker
 {
@@ -55,6 +57,13 @@ namespace ASecureNoteMaker
         // Custom Functions
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
+            passphrase = string.Empty;
+
+            await PassphraseLogic();
+
+            if (string.IsNullOrEmpty(passphrase))
+            { return; }
+
             try
             {
                 var result = await FilePicker.PickAsync();
@@ -71,7 +80,7 @@ namespace ASecureNoteMaker
             }
         }
 
-        private async void SaveText_ClickedAsync(object sender, EventArgs e)
+        private async Task PassphraseLogic()
         {
             if (passphrase.IsNullOrWhiteSpace())
             {
@@ -81,15 +90,33 @@ namespace ASecureNoteMaker
             if (passphrase.IsNullOrWhiteSpace())
             {
                 await DisplayAlert("Blank value", "Can't have blank text in the password", "Ok");
+            }
+
+            return;
+        }
+
+        private void AutoSaverTimerStopClear()
+        {
+            autoSaveTimer?.Stop();
+            AutoSave.IsChecked = false;
+        }
+
+        private async void SaveText_ClickedAsync(object sender, EventArgs e)
+        {
+            await PassphraseLogic();
+            
+            if(passphrase.IsNullOrWhiteSpace())
+            {
+                AutoSaverTimerStopClear();
                 return;
             }
 
-            
             var fileSaverResult = await FileSaver.Default.SaveAsync("Newfile.txt", new MemoryStream(), CancellationToken.None);
 
-            if (fileSaverResult == null)
+            if (fileSaverResult.FilePath == null)
             {
                 await DisplayAlert("Blank value", "No locatoin found or used.", "Ok");
+                AutoSaverTimerStopClear();
                 return;
             }
 
@@ -97,6 +124,8 @@ namespace ASecureNoteMaker
 
 
             MainPageStatus.Text = $"Note Saved in {encryptedFilePath}";
+
+            return;
         }
 
         private async void NewFile_Clicked(object sender, EventArgs e)

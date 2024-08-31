@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ASecureNoteMaker.MainPage">
-
+             x:Class="ASecureNoteMaker.MainPage" >
 
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="File">
@@ -48,18 +47,35 @@
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
-    <StackLayout>
-        <Editor x:Name="Note" Text="" IsSpellCheckEnabled="True" IsTextPredictionEnabled="True" 
-                    Placeholder="Text goes here." HeightRequest="500" WidthRequest="500"/>
-        
-        <Button Text="Save" 
-                    Clicked="SaveText_ClickedAsync" HeightRequest="50" WidthRequest="100"/>
-        
-        <CheckBox x:Name="AutoSave" 
-                CheckedChanged="AutoSave_CheckedChanged"></CheckBox><Label Text="AutoSave"></Label>
-        
-        <Label x:Name="MainPageStatus" Text="" HorizontalOptions="Center" VerticalOptions="End" />
-    </StackLayout>
+    <Grid RowDefinitions="*, Auto, Auto" 
+          Padding="10,10,10,10" 
+          RowSpacing="10">
+        <Editor Grid.Row="0" 
+                x:Name="Note" 
+                Text="" 
+                IsSpellCheckEnabled="True" 
+                IsTextPredictionEnabled="True" 
+                Placeholder="Text goes here."
+                Margin="10,0,10,0" />
 
+        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center">
+            <Button Text="Save" 
+                    Clicked="SaveText_ClickedAsync" 
+                    HeightRequest="50" 
+                    WidthRequest="100"/>
+
+            <CheckBox x:Name="AutoSave" 
+                      CheckedChanged="AutoSave_CheckedChanged"
+                      Margin="10,0,0,0"/>
+            <Label Text="AutoSave" 
+                   VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="2" 
+               x:Name="MainPageStatus" 
+               Text="" 
+               HorizontalOptions="Center" 
+               VerticalOptions="End" />
+    </Grid>
 
 </ContentPage>
