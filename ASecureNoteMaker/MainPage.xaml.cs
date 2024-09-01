@@ -1,5 +1,6 @@
 ﻿using ASecureNoteMaker.Extensions;
 using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Maui.Views;
 using System.Text;
 
 
@@ -123,7 +124,7 @@ namespace ASecureNoteMaker
             FilEncryption.EncryptFile(Note.Text, fileSaverResult.FilePath, passphrase);
 
 
-            MainPageStatus.Text = $"Note Saved in {encryptedFilePath}";
+            MainPageStatus.Text = $"Note Saved in {fileSaverResult}";
 
             return;
         }
@@ -148,6 +149,10 @@ namespace ASecureNoteMaker
             }
         }
 
+        private void Settings_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new SettingsPage());
+        }
     }
 
 

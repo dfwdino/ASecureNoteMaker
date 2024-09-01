@@ -42,7 +42,7 @@
             </MenuBarItem>-->
         <MenuBarItem Text="Opitions">
             <MenuFlyoutItem Text="Settings"
-                            Command="{Binding RefreshCommand}" />
+                            Clicked="Settings_Clicked" />
 
         </MenuBarItem>
     </ContentPage.MenuBarItems>
