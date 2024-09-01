@@ -60,7 +60,7 @@
 
         <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center">
             <Button Text="Save" 
-                    Clicked="SaveText_ClickedAsync" 
+                    Clicked="SaveText_Clicked" 
                     HeightRequest="50" 
                     WidthRequest="100"/>
 

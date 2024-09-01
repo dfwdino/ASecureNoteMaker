@@ -1,7 +1,5 @@
 ﻿using ASecureNoteMaker.Extensions;
 using CommunityToolkit.Maui.Storage;
-using CommunityToolkit.Maui.Views;
-using System.Text;
 
 
 namespace ASecureNoteMaker
@@ -58,39 +56,72 @@ namespace ASecureNoteMaker
         // Custom Functions
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
+            if (Note.Text.Length > 0)
+            {
+                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?", "Yes", "No");
+
+                if (NewFile.Equals(false))
+
+                { return; }
+
+
+            }
+
+            ///This is need b/c I cant do await for this function with out return Task in the OpenFile function. Which will brack the UI call. 
+            var PassphraseLogicTask = PassphraseLogic();
+
+            await PassphraseLogicTask;
+
+            var result = await FilePicker.PickAsync();
+
+            if (result.FullPath.IsNullOrWhiteSpace())
+            {
+                DisplayAlert("File Selected", "No file is selected.", "Ok");
+                return;
+            }
+
             passphrase = string.Empty;
 
-            await PassphraseLogic();
+            await PassphraseLogic(result.FileName);
 
-            if (string.IsNullOrEmpty(passphrase))
+            if (passphrase.IsNullOrWhiteSpace())
             { return; }
+
 
             try
             {
-                var result = await FilePicker.PickAsync();
+                string decrypttext = FilEncryption.DecryptFile(result.FullPath, passphrase);
 
-                if (result != null)
+                if (decrypttext.IsNullOrWhiteSpace())
                 {
-                    Note.Text = FilEncryption.DecryptFile(result.FullPath, passphrase);
-
+                    DisplayAlert("Blank File", "The file is not encypted or blank.", "OK");
+                    return;
                 }
+
+                Note.Text = FilEncryption.DecryptFile(result.FullPath, passphrase);
+
+
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
             }
+
+            return;
         }
 
-        private async Task PassphraseLogic()
+        private async Task PassphraseLogic(string filename = "")
         {
             if (passphrase.IsNullOrWhiteSpace())
             {
-                passphrase = await DisplayPromptAsync("Input", "Please enter some text:");
+                passphrase = await DisplayPromptAsync("Input", $"Please enter some text for file: {filename}");
+                Task.WaitAll();
             }
 
             if (passphrase.IsNullOrWhiteSpace())
             {
                 await DisplayAlert("Blank value", "Can't have blank text in the password", "Ok");
+                Task.WaitAll();
             }
 
             return;
@@ -102,11 +133,12 @@ namespace ASecureNoteMaker
             AutoSave.IsChecked = false;
         }
 
-        private async void SaveText_ClickedAsync(object sender, EventArgs e)
+        private async Task SaveText_ClickedAsync(object sender, EventArgs e)
         {
             await PassphraseLogic();
-            
-            if(passphrase.IsNullOrWhiteSpace())
+            Task.WaitAll();
+
+            if (passphrase.IsNullOrWhiteSpace())
             {
                 AutoSaverTimerStopClear();
                 return;
@@ -122,7 +154,6 @@ namespace ASecureNoteMaker
             }
 
             FilEncryption.EncryptFile(Note.Text, fileSaverResult.FilePath, passphrase);
-
 
             MainPageStatus.Text = $"Note Saved in {fileSaverResult}";
 
@@ -152,6 +183,11 @@ namespace ASecureNoteMaker
         private void Settings_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(new SettingsPage());
+        }
+
+        private async void SaveText_Clicked(object sender, EventArgs e)
+        {
+            await SaveText_ClickedAsync(null, null);
         }
     }
 

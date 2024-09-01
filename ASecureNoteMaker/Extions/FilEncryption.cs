@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 public class FilEncryption
@@ -49,6 +47,7 @@ public class FilEncryption
                 using (var msDecrypted = new MemoryStream())
                 {
                     cryptoStream.CopyTo(msDecrypted);
+
                     return Encoding.UTF8.GetString(msDecrypted.ToArray());
                 }
             }
