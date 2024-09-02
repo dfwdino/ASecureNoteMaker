@@ -1,3 +1,4 @@
+using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
 using System.Text.Json;
 
