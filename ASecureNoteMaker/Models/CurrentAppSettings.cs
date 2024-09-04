@@ -10,12 +10,18 @@ namespace ASecureNoteMaker.Models
         private string _fileName = string.Empty;
         public string FileName
         {
-            get => _fileName;
+            get
+            {
+                if (_fileName.IsNullOrWhiteSpace())
+                    _fileName = $"TodaysFile-{DateTime.Now.ToFileTime()}";
+
+                return _fileName;
+            }
 
             set
             {
                 if (value.IsNullOrWhiteSpace())
-                    _fileName = $"TodaysFile-{DateTime.Now.ToShortDateString()}";
+                    _fileName = $"TodaysFile-{DateTime.Now.ToFileTime()}";
                 else
                     _fileName = value;
             }

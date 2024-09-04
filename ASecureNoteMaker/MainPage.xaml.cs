@@ -17,21 +17,12 @@ namespace ASecureNoteMaker
         {
             InitializeComponent();
             this.Loaded += OnPageLoaded;
+
         }
 
         private async void OnPageLoaded(object sender, EventArgs e)
         {
 
-
-            //When add seetings... need to reade the settings file to get default file.
-            //string result = await DisplayPromptAsync("Input", "Please enter some text:");
-
-            //if (!string.IsNullOrEmpty(result))
-            //{
-            //    passphrase = result;
-            //}
-
-            //OpenFile_Clicked(null, null);
         }
 
         private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
@@ -167,13 +158,15 @@ namespace ASecureNoteMaker
             {
                 var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
 
-                _CurrentAppSettings.FullLocation = fileSaverResult.FilePath;
-
-                if (!_CurrentAppSettings.FileLocation.IsNullOrWhiteSpace())
+                if (fileSaverResult.FilePath.IsNullOrWhiteSpace())
                 {
                     await DisplayAlert("Blank value", "No locatoin found or used.", "Ok");
                     AutoSaverTimerStopClear();
                     return;
+                }
+                else
+                {
+                    _CurrentAppSettings.FullLocation = fileSaverResult.FilePath;
                 }
             }
 
