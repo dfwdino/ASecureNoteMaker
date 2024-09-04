@@ -1,30 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ASecureNoteMaker.Extensions;
 
 namespace ASecureNoteMaker.Models
 {
     internal class CurrentAppSettings
     {
-        public string Passphrase = string.Empty;
-        public string EncryptedFilePath = string.Empty;
-        public string FileName = $"TodaysFile-{DateTime.Now.ToFileTime()}";
-        public string FileLocation = string.Empty;
+        public string Passphrase { get; set; } = string.Empty;
+        public string EncryptedFilePath { get; set; } = string.Empty;
 
-public string FullLocation
-    {
-        get { return Path.Combine(FolderLocation, FileName); }
-        set
+        private string _fileName = string.Empty;
+        public string FileName
         {
-            if (!string.IsNullOrEmpty(value))
+            get => _fileName;
+
+            set
             {
-                FolderLocation = Path.GetDirectoryName(value);
-                FileName = Path.GetFileName(value);
+                if (value.IsNullOrWhiteSpace())
+                    _fileName = $"TodaysFile-{DateTime.Now.ToShortDateString()}";
+                else
+                    _fileName = value;
             }
         }
-    }
 
+        public string FileLocation { get; set; } = string.Empty;
+
+        public string FullLocation
+        {
+            get => Path.Combine(FileLocation, FileName);
+
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    FileLocation = string.Empty;
+                    FileName = string.Empty;
+                }
+                else
+                {
+                    FileLocation = Path.GetDirectoryName(value) ?? string.Empty;
+                    FileName = Path.GetFileName(value);
+                }
+            }
+        }
     }
 }

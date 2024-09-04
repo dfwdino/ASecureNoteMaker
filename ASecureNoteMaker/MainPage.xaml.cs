@@ -52,7 +52,7 @@ namespace ASecureNoteMaker
 
         }
 
-       
+
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
             if (Note.Text.Length > 0)
@@ -76,7 +76,7 @@ namespace ASecureNoteMaker
 
                 await PassphraseLogicTask;
 
-               
+
                 var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
 
                 _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
@@ -167,10 +167,9 @@ namespace ASecureNoteMaker
             {
                 var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
 
-                _CurrentAppSettings.FileLocation = Path.GetDirectoryName(fileSaverResult.FilePath);
-                _CurrentAppSettings.FileName = Path.GetFileName(fileSaverResult.FilePath);
+                _CurrentAppSettings.FullLocation = fileSaverResult.FilePath;
 
-                if (_CurrentAppSettings.FileLocation == null)
+                if (!_CurrentAppSettings.FileLocation.IsNullOrWhiteSpace())
                 {
                     await DisplayAlert("Blank value", "No locatoin found or used.", "Ok");
                     AutoSaverTimerStopClear();
