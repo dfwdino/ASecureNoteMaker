@@ -51,53 +51,61 @@ namespace ASecureNoteMaker
                 bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?", "Yes", "No");
 
                 if (NewFile.Equals(false))
-
-                { return; }
-
-            }
-
-
-            #region Blank Values. Maybe Save them?
-
-            if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-            {
-                bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
-
-                var PassphraseLogicTask = PassphraseLogic();
-
-                await PassphraseLogicTask;
-
-
-                FileSaverResult fileSaverResult;
-
-                try
                 {
-                    fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
-                }
-                catch (Exception ex)
-                {
-                    DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
                     return;
                 }
-
-
-                _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
-
-                if (!_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                else
                 {
-                    DisplayAlert("File Selected", "No file is selected.", "Ok");
-                    return;
+                    bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
+
+                    if (NewFile.Equals(true))
+                    {
+
+
+                        if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                        {
+                            bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
+
+                            var PassphraseLogicTask = PassphraseLogic();
+
+                            await PassphraseLogicTask;
+
+
+                            FileSaverResult fileSaverResult;
+
+                            try
+                            {
+                                fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                            }
+                            catch (Exception ex)
+                            {
+                                DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
+                                return;
+                            }
+
+
+                            _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
+
+                            if (!_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                            {
+                                DisplayAlert("File Selected", "No file is selected.", "Ok");
+                                return;
+                            }
+
+                        }
+                        else
+                        {
+                            FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
+
+                            _CurrentAppSettings.Passphrase = string.Empty;
+                        }
+                    }
+
                 }
 
-            }
-            else
-            {
-                FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
 
-                _CurrentAppSettings.Passphrase = string.Empty;
             }
-
-            #endregion
+         
 
             #region Loading New File
             await PassphraseLogic();
@@ -151,13 +159,13 @@ namespace ASecureNoteMaker
         private void AutoSaverTimerStopClear()
         {
             autoSaveTimer?.Stop();
-            AutoSave.IsChecked = false;
+            AutoSaveCheckbox.IsChecked = false;
         }
 
         private async Task SaveText_ClickedAsync(object sender, EventArgs e)
         {
             await PassphraseLogic();
-            Task.WaitAll();
+          
 
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
             {
@@ -167,7 +175,8 @@ namespace ASecureNoteMaker
 
             if (_CurrentAppSettings.FileLocation.IsNullOrWhiteSpace())
             {
-                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName,new MemoryStream());
+                Task.WaitAll();
 
                 if (fileSaverResult.FilePath.IsNullOrWhiteSpace())
                 {
@@ -181,9 +190,9 @@ namespace ASecureNoteMaker
                 }
             }
 
-            FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.FileLocation, _CurrentAppSettings.Passphrase);
+            FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.FullLocation, _CurrentAppSettings.Passphrase);
 
-            MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FileLocation}";
+            MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FullLocation}";
 
             return;
         }

@@ -64,7 +64,7 @@
                     HeightRequest="50" 
                     WidthRequest="100"/>
 
-            <CheckBox x:Name="AutoSave" 
+            <CheckBox x:Name="AutoSaveCheckbox" 
                       CheckedChanged="AutoSave_CheckedChanged"
                       Margin="10,0,0,0"/>
             <Label Text="AutoSave" 
