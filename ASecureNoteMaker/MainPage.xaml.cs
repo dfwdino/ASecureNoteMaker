@@ -68,7 +68,18 @@ namespace ASecureNoteMaker
                 await PassphraseLogicTask;
 
 
-                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                FileSaverResult fileSaverResult;
+
+                try
+                {
+                    fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
+                    return;
+                }
+
 
                 _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
 

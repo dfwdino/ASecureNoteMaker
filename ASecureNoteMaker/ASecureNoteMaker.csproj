@@ -21,10 +21,13 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>ASecureNoteMaker</ApplicationTitle>
+		<ApplicationTitle>A Secure Note</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.asecurenotemaker</ApplicationId>
+
+		<!--Fixes not running onmy box... Why is that?-->
+		<WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>

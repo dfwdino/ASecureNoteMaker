@@ -7,13 +7,15 @@ namespace ASecureNoteMaker.Models
         public string Passphrase { get; set; } = string.Empty;
         public string EncryptedFilePath { get; set; } = string.Empty;
 
+        private string _defaultFileNameValue = $"TodaysFile-{DateTime.Now.ToFileTime()}.txt";
+
         private string _fileName = string.Empty;
         public string FileName
         {
             get
             {
                 if (_fileName.IsNullOrWhiteSpace())
-                    _fileName = $"TodaysFile-{DateTime.Now.ToFileTime()}";
+                    _fileName = _defaultFileNameValue;
 
                 return _fileName;
             }
@@ -21,7 +23,7 @@ namespace ASecureNoteMaker.Models
             set
             {
                 if (value.IsNullOrWhiteSpace())
-                    _fileName = $"TodaysFile-{DateTime.Now.ToFileTime()}";
+                    _fileName = _defaultFileNameValue;
                 else
                     _fileName = value;
             }
