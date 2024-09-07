@@ -98,6 +98,7 @@ namespace ASecureNoteMaker
                             FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
 
                             _CurrentAppSettings.Passphrase = string.Empty;
+
                         }
                     }
 
