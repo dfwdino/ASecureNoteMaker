@@ -48,7 +48,7 @@ namespace ASecureNoteMaker
         {
             if (Note.Text.Length > 0)
             {
-                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?", "Yes", "No");
+                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure you update has been saved.", "Yes", "No");
 
                 if (NewFile.Equals(false))
                 {
@@ -58,13 +58,13 @@ namespace ASecureNoteMaker
                 {
                     bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
 
-                    if (NewFile.Equals(true))
+                    if (SaveFile.Equals(true))
                     {
 
 
                         if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                         {
-                            bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
+                            //bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
 
                             var PassphraseLogicTask = PassphraseLogic();
 
@@ -86,7 +86,7 @@ namespace ASecureNoteMaker
 
                             _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
 
-                            if (!_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                            if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                             {
                                 DisplayAlert("File Selected", "No file is selected.", "Ok");
                                 return;
@@ -106,9 +106,13 @@ namespace ASecureNoteMaker
 
 
             }
-         
+
 
             #region Loading New File
+
+            //Clear out any new values if they are saved.
+            ClearOutStoredValues();
+
             await PassphraseLogic();
 
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
@@ -122,7 +126,7 @@ namespace ASecureNoteMaker
 
                 if (decrypttext.IsNullOrWhiteSpace())
                 {
-                    await DisplayAlert("Blank File", "The file is not encypted or blank.", "OK");
+                    await DisplayAlert("Blank File", "The file is not encypted, blank or wrong passcode.", "OK");
                     return;
                 }
 
@@ -166,7 +170,7 @@ namespace ASecureNoteMaker
         private async Task SaveText_ClickedAsync(object sender, EventArgs e)
         {
             await PassphraseLogic();
-          
+
 
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
             {
@@ -176,7 +180,7 @@ namespace ASecureNoteMaker
 
             if (_CurrentAppSettings.FileLocation.IsNullOrWhiteSpace())
             {
-                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName,new MemoryStream());
+                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream());
                 Task.WaitAll();
 
                 if (fileSaverResult.FilePath.IsNullOrWhiteSpace())
@@ -193,17 +197,28 @@ namespace ASecureNoteMaker
 
             FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.FullLocation, _CurrentAppSettings.Passphrase);
 
-            MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FullLocation}";
+            MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FullLocation} at {DateTime.Now}";
 
             return;
         }
 
         private async void NewFile_Clicked(object sender, EventArgs e)
         {
-            bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?", "Yes", "No");
+            bool NewFile = false;
+
+            if (Note.Text.Length.Equals(0))
+            {
+                return;
+            }
+
+            NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file? Make sure you stuff is saved before creating a new file.", "Yes", "No");
 
             if (NewFile)
             {
+                ClearOutStoredValues();
+
+                MainPageStatus.Text = string.Empty;
+
                 Note.Text = string.Empty;
             }
         }
@@ -211,6 +226,7 @@ namespace ASecureNoteMaker
         private async void Exit_Clicked(object sender, EventArgs e)
         {
             bool answer = await DisplayAlert("Close Program", "Do you want to close the program?", "Yes", "No");
+
             if (answer)
             {
                 // Close the application
@@ -227,6 +243,13 @@ namespace ASecureNoteMaker
         {
             await SaveText_ClickedAsync(null, null);
         }
+
+        private void ClearOutStoredValues()
+        {
+            _CurrentAppSettings = new CurrentAppSettings();
+            MainPageStatus.Text = string.Empty;
+        }
+
     }
 
 
