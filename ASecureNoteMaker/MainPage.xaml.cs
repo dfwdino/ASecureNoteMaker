@@ -86,6 +86,10 @@ namespace ASecureNoteMaker
 
                             _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
 
+
+                            History.Add(new MenuFlyoutItem { Text = fileSaverResult.FilePath });
+
+
                             if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                             {
                                 DisplayAlert("File Selected", "No file is selected.", "Ok");

@@ -8,12 +8,12 @@
             <MenuFlyoutItem Text="New File"
                             Clicked="NewFile_Clicked" />
 
-            <MenuFlyoutItem Text="Load File"
+            <MenuFlyoutItem Text="Open File"
                             Clicked="OpenFile_Clicked" />
 
            
 
-            <MenuFlyoutSubItem Text="History">
+            <MenuFlyoutSubItem x:Name="History" Text="History">
                 <!--<MenuFlyoutItem Text="Redmond, USA"
                                 Command="{Binding ChangeLocationCommand}"
                                 CommandParameter="Redmond" />
