@@ -4,7 +4,7 @@
              x:Class="ASecureNoteMaker.MainPage" >
 
     <ContentPage.MenuBarItems>
-        <MenuBarItem Text="File">
+        <MenuBarItem x:Name="MainMenu" Text="File">
             <MenuFlyoutItem Text="New File"
                             Clicked="NewFile_Clicked" />
 
@@ -19,10 +19,9 @@
                                 CommandParameter="Redmond" />
                     <MenuFlyoutItem Text="London, UK"
                                 Command="{Binding ChangeLocationCommand}"
-                                CommandParameter="London" />
+                                CommandParameter="London" />-->
                     <MenuFlyoutItem Text="Berlin, DE"
-                                Command="{Binding ChangeLocationCommand}"
-                                CommandParameter="Berlin"/>-->
+                                CommandParameter="Berlin"/>
             </MenuFlyoutSubItem>
 
             <MenuFlyoutItem Text="Exit"

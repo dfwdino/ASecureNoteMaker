@@ -3,6 +3,7 @@ using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
 
 
+
 namespace ASecureNoteMaker
 {
     public partial class MainPage : ContentPage
@@ -22,6 +23,8 @@ namespace ASecureNoteMaker
 
         private async void OnPageLoaded(object sender, EventArgs e)
         {
+
+           
 
         }
 
@@ -87,8 +90,6 @@ namespace ASecureNoteMaker
                             _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
 
 
-                            History.Add(new MenuFlyoutItem { Text = fileSaverResult.FilePath });
-
 
                             if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                             {
@@ -144,6 +145,8 @@ namespace ASecureNoteMaker
             }
 
             #endregion
+
+            
 
             return;
         }
@@ -245,7 +248,15 @@ namespace ASecureNoteMaker
 
         private async void SaveText_Clicked(object sender, EventArgs e)
         {
-            await SaveText_ClickedAsync(null, null);
+
+
+            var flyout = History;
+            var itemX = new MenuFlyoutItem { Text = "Item X" };
+            itemX.Parent = History;
+            MainMenu.Add(itemX);
+
+
+            //await SaveText_ClickedAsync(null, null);
         }
 
         private void ClearOutStoredValues()
