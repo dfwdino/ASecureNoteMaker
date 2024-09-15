@@ -11,7 +11,7 @@
             <MenuFlyoutItem Text="Open File"
                             Clicked="OpenFile_Clicked" />
 
-           
+
 
             <MenuFlyoutSubItem x:Name="Historymnu" Text="History">
                 <!--<MenuFlyoutItem Text="Redmond, USA"
@@ -20,14 +20,14 @@
                     <MenuFlyoutItem Text="London, UK"
                                 Command="{Binding ChangeLocationCommand}"
                                 CommandParameter="London" />-->
-                    <MenuFlyoutItem Text="Berlin, DE"
+                <MenuFlyoutItem Text="Berlin, DE"
                                 CommandParameter="Berlin"/>
             </MenuFlyoutSubItem>
 
             <MenuFlyoutItem Text="Exit"
                             Clicked="Exit_Clicked" />
-            
-            
+
+
         </MenuBarItem>
         <!--<MenuBarItem Text="Files">
                 
@@ -46,31 +46,43 @@
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
-    <Grid RowDefinitions="*, Auto, Auto" 
+    <Grid RowDefinitions="30, *, Auto,Auto" 
           Padding="10,10,10,10" 
           RowSpacing="10">
-        <Editor Grid.Row="0" 
+
+        <HorizontalStackLayout Grid.Row="0" Grid.Column="0">
+            <Label x:Name="lblFileName" Text="FileName"  Margin="10,0,10,0"/>
+
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="0" Grid.Column="1" HorizontalOptions="Center">
+
+            <Button Text="Save" 
+                 Clicked="SaveText_Clicked" 
+                 HeightRequest="50" 
+                 WidthRequest="85"/>
+
+            <CheckBox x:Name="AutoSaveCheckbox" 
+                   CheckedChanged="AutoSave_CheckedChanged"
+                   Margin="10,0,0,0"/>
+            
+            <Label Text="AutoSave" VerticalOptions="Center"/>
+            
+        </HorizontalStackLayout>
+
+        <Editor Grid.Row="1" 
                 x:Name="Note" 
                 Text="" 
                 IsSpellCheckEnabled="True" 
                 IsTextPredictionEnabled="True" 
                 Placeholder="Text goes here."
-                Margin="10,0,10,0" />
+                Margin="10,10,10,0" />
 
-        <HorizontalStackLayout Grid.Row="1" HorizontalOptions="Center">
-            <Button Text="Save" 
-                    Clicked="SaveText_Clicked" 
-                    HeightRequest="50" 
-                    WidthRequest="100"/>
+        <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center">
 
-            <CheckBox x:Name="AutoSaveCheckbox" 
-                      CheckedChanged="AutoSave_CheckedChanged"
-                      Margin="10,0,0,0"/>
-            <Label Text="AutoSave" 
-                   VerticalOptions="Center"/>
         </HorizontalStackLayout>
 
-        <Label Grid.Row="2" 
+        <Label Grid.Row="3" 
                x:Name="MainPageStatus" 
                Text="" 
                HorizontalOptions="Center" 

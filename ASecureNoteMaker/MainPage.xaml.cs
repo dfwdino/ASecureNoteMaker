@@ -28,9 +28,16 @@ namespace ASecureNoteMaker
         private async void OnPageLoaded(object sender, EventArgs e)
         {
 
-            string jsonString = File.ReadAllText(_SettingsFileFullLocation);
 
-            _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
+            if (File.Exists(_SettingsFileFullLocation))
+            {
+                string jsonString = string.Empty;
+
+                jsonString = File.ReadAllText(_SettingsFileFullLocation);
+
+                _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
+            }
+
 
         }
 
@@ -143,6 +150,8 @@ namespace ASecureNoteMaker
 
                 Note.Text = FilEncryption.DecryptFile(result.FullPath, _CurrentAppSettings.Passphrase);
 
+                lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
+
 
             }
             catch (Exception ex)
@@ -152,7 +161,7 @@ namespace ASecureNoteMaker
 
             #endregion
 
-            
+
 
             return;
         }
@@ -212,6 +221,8 @@ namespace ASecureNoteMaker
 
             MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FullLocation} at {DateTime.Now}";
 
+            lblFileName.Text = $"Current File is " + Path.GetFileName(_CurrentAppSettings.FullLocation);
+
             return;
         }
 
@@ -233,6 +244,8 @@ namespace ASecureNoteMaker
                 MainPageStatus.Text = string.Empty;
 
                 Note.Text = string.Empty;
+
+                lblFileName.Text = $"File not saved yet.";
             }
         }
 
@@ -256,13 +269,13 @@ namespace ASecureNoteMaker
         {
 
 
-           // var flyout = Historymnu as MenuFlyoutSubItem;
+            // var flyout = Historymnu as MenuFlyoutSubItem;
 
-           //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
+            //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
 
-           // flyout.Add(itemX);
+            // flyout.Add(itemX);
             //MainMenu.Add(itemX);
-           
+
 
             await SaveText_ClickedAsync(null, null);
         }
