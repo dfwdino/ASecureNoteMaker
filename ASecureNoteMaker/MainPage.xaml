@@ -13,7 +13,7 @@
 
            
 
-            <MenuFlyoutSubItem x:Name="History" Text="History">
+            <MenuFlyoutSubItem x:Name="Historymnu" Text="History">
                 <!--<MenuFlyoutItem Text="Redmond, USA"
                                 Command="{Binding ChangeLocationCommand}"
                                 CommandParameter="Redmond" />

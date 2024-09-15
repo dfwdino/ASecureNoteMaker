@@ -1,6 +1,7 @@
 ﻿using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
+using System.Text.Json;
 
 
 
@@ -10,6 +11,8 @@ namespace ASecureNoteMaker
     {
 
         CurrentAppSettings _CurrentAppSettings = new();
+        SettingsModel _SettingsModel = new SettingsModel();
+        private string _SettingsFileFullLocation = string.Empty;
 
         private IDispatcherTimer autoSaveTimer;
 
@@ -17,6 +20,7 @@ namespace ASecureNoteMaker
         public MainPage()
         {
             InitializeComponent();
+            _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
             this.Loaded += OnPageLoaded;
 
         }
@@ -24,7 +28,9 @@ namespace ASecureNoteMaker
         private async void OnPageLoaded(object sender, EventArgs e)
         {
 
-           
+            string jsonString = File.ReadAllText(_SettingsFileFullLocation);
+
+            _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
         }
 
@@ -250,13 +256,15 @@ namespace ASecureNoteMaker
         {
 
 
-            var flyout = History;
-            var itemX = new MenuFlyoutItem { Text = "Item X" };
-            itemX.Parent = History;
-            MainMenu.Add(itemX);
+           // var flyout = Historymnu as MenuFlyoutSubItem;
 
+           //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
 
-            //await SaveText_ClickedAsync(null, null);
+           // flyout.Add(itemX);
+            //MainMenu.Add(itemX);
+           
+
+            await SaveText_ClickedAsync(null, null);
         }
 
         private void ClearOutStoredValues()

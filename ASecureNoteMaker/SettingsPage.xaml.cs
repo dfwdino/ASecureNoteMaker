@@ -11,7 +11,7 @@ public partial class SettingsPage : ContentPage
     public SettingsPage()
 	{
 		InitializeComponent();
-        _SettingsFileFullLocation = Path.Combine(FileSystem.Current.AppDataDirectory,"Settings.json");
+        _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory,"Settings.json");
 	}
 
     private void LoadSettingFile()
@@ -33,6 +33,8 @@ public partial class SettingsPage : ContentPage
 
         string jsonString = JsonSerializer.Serialize(_SettingsModel, options);
 
+        string directoryPath = Path.GetDirectoryName(_SettingsFileFullLocation);
+
         File.WriteAllText(_SettingsFileFullLocation, jsonString);
     }
 
@@ -46,5 +48,10 @@ public partial class SettingsPage : ContentPage
 
 
 
+    }
+
+    private void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        LoadSettingFile();
     }
 }
