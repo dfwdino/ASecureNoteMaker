@@ -69,57 +69,54 @@ namespace ASecureNoteMaker
                 {
                     return;
                 }
-                else
+                
+                
+            bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
+
+            if (SaveFile.Equals(true))
+            {
+                if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                 {
-                    bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
+                    //bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
 
-                    if (SaveFile.Equals(true))
+                    var PassphraseLogicTask = PassphraseLogic();
+
+                    await PassphraseLogicTask;
+
+                    FileSaverResult fileSaverResult;
+
+                    try
                     {
+                        fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
+                        return;
+                    }
 
 
-                        if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-                        {
-                            //bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
-
-                            var PassphraseLogicTask = PassphraseLogic();
-
-                            await PassphraseLogicTask;
-
-
-                            FileSaverResult fileSaverResult;
-
-                            try
-                            {
-                                fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
-                            }
-                            catch (Exception ex)
-                            {
-                                DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
-                                return;
-                            }
-
-
-                            _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
+                    _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
 
 
 
-                            if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-                            {
-                                DisplayAlert("File Selected", "No file is selected.", "Ok");
-                                return;
-                            }
-
-                        }
-                        else
-                        {
-                            FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
-
-                            _CurrentAppSettings.Passphrase = string.Empty;
-
-                        }
+                    if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                    {
+                        DisplayAlert("File Selected", "No file is selected.", "Ok");
+                        return;
                     }
 
                 }
+                else
+                {
+                    FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
+
+                    _CurrentAppSettings.Passphrase = string.Empty;
+
+                }
+            }
+
+            
 
 
             }
