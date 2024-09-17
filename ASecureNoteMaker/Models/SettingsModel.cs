@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ASecureNoteMaker.Models
+﻿namespace ASecureNoteMaker.Models
 {
-    internal class SettingsModel
+    public class SettingsModel
     {
         public string DefaultFileLocation { get; set; } = string.Empty;
     }

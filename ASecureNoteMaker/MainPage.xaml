@@ -14,12 +14,7 @@
 
 
             <MenuFlyoutSubItem x:Name="Historymnu" Text="History">
-                <!--<MenuFlyoutItem Text="Redmond, USA"
-                                Command="{Binding ChangeLocationCommand}"
-                                CommandParameter="Redmond" />
-                    <MenuFlyoutItem Text="London, UK"
-                                Command="{Binding ChangeLocationCommand}"
-                                CommandParameter="London" />-->
+
                 <MenuFlyoutItem Text="Berlin, DE"
                                 CommandParameter="Berlin"/>
             </MenuFlyoutSubItem>
@@ -29,16 +24,7 @@
 
 
         </MenuBarItem>
-        <!--<MenuBarItem Text="Files">
-                
-                <MenuFlyoutSeparator />
-                <MenuFlyoutItem Text="Add File"
-                            Command="{Binding AddLocationCommand}" />
-                <MenuFlyoutItem Text="Edit Location"
-                            Command="{Binding EditLocationCommand}" />
-                <MenuFlyoutItem Text="Remove Location"
-                            Command="{Binding RemoveLocationCommand}" />
-            </MenuBarItem>-->
+
         <MenuBarItem Text="Opitions">
             <MenuFlyoutItem Text="Settings"
                             Clicked="Settings_Clicked" />
@@ -51,7 +37,7 @@
           RowSpacing="10">
 
         <HorizontalStackLayout Grid.Row="0" Grid.Column="0">
-            <Label x:Name="lblFileName" Text="FileName"  Margin="10,0,10,0"/>
+            <Label x:Name="lblFileName" Text=""  Margin="10,0,10,0"/>
 
         </HorizontalStackLayout>
 
@@ -65,22 +51,28 @@
             <CheckBox x:Name="AutoSaveCheckbox" 
                    CheckedChanged="AutoSave_CheckedChanged"
                    Margin="10,0,0,0"/>
-            
-            <Label Text="AutoSave" VerticalOptions="Center"/>
-            
-        </HorizontalStackLayout>
 
-        <Editor Grid.Row="1" 
+            <Label Text="AutoSave" VerticalOptions="Center"/>
+
+        </HorizontalStackLayout>
+        <Frame Grid.Row="1" 
+       Margin="10,10,10,0" 
+       BorderColor="Gray" 
+       CornerRadius="5" 
+       Padding="0">
+
+
+            <Editor Grid.Row="1" 
                 x:Name="Note" 
                 Text="" 
                 IsSpellCheckEnabled="True" 
                 IsTextPredictionEnabled="True" 
                 Placeholder="Text goes here."
-                Margin="10,10,10,0" />
+                Margin="0,0,0,0"
+               BackgroundColor="Transparent"/>
+        </Frame>
 
-        <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center">
 
-        </HorizontalStackLayout>
 
         <Label Grid.Row="3" 
                x:Name="MainPageStatus" 

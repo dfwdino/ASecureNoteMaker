@@ -2,14 +2,15 @@
 
 namespace ASecureNoteMaker.Models
 {
+    
     internal class CurrentAppSettings
     {
 
         #region Private Variables 
 
-        private string _defaultFileNameValue = $"TodaysFile-{DateTime.Now.ToFileTime()}.txt";
-
+        private string _defaultFileNameValue => $"TodaysFile-{DateTime.Now.ToFileTime()}.txt";
         private string _fileName = string.Empty;
+       
 
         #endregion End Private Variables
 
@@ -20,27 +21,16 @@ namespace ASecureNoteMaker.Models
         public string EncryptedFilePath { get; set; } = string.Empty;
         public string FileLocation { get; set; } = string.Empty;
 
+        public SettingsModel Settings { get; set; } = new SettingsModel();
+
         #endregion End Public Variables
 
 
 
         public string FileName
         {
-            get
-            {
-                if (_fileName.IsNullOrWhiteSpace())
-                    _fileName = _defaultFileNameValue;
-
-                return _fileName;
-            }
-
-            set
-            {
-                if (value.IsNullOrWhiteSpace())
-                    _fileName = _defaultFileNameValue;
-                else
-                    _fileName = value;
-            }
+            get => string.IsNullOrWhiteSpace(_fileName) ? _defaultFileNameValue : _fileName;
+            set => _fileName = string.IsNullOrWhiteSpace(value) ? _defaultFileNameValue : value;
         }
 
 

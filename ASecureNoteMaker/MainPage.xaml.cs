@@ -1,7 +1,6 @@
 ﻿using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
-using System.Reflection;
 using System.Text.Json;
 
 
@@ -15,8 +14,6 @@ namespace ASecureNoteMaker
         SettingsModel _SettingsModel = new SettingsModel();
         private string _SettingsFileFullLocation = string.Empty;
 
-
-
         private IDispatcherTimer autoSaveTimer;
 
         // Base Functions
@@ -25,9 +22,6 @@ namespace ASecureNoteMaker
             InitializeComponent();
             _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
             this.Loaded += OnPageLoaded;
-
-            
-
         }
 
         private async void OnPageLoaded(object sender, EventArgs e)
