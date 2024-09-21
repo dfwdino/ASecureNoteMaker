@@ -20,22 +20,62 @@ namespace ASecureNoteMaker
         public MainPage()
         {
             InitializeComponent();
+
             _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
+
             this.Loaded += OnPageLoaded;
         }
 
         private async void OnPageLoaded(object sender, EventArgs e)
         {
-
-
-            if (File.Exists(_SettingsFileFullLocation))
+            if (File.Exists(_SettingsFileFullLocation).Equals(false))
             {
-                string jsonString = string.Empty;
-
-                jsonString = File.ReadAllText(_SettingsFileFullLocation);
-
-                _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
+                return;
             }
+
+           
+            string jsonString = string.Empty;
+
+            jsonString = File.ReadAllText(_SettingsFileFullLocation);
+
+            _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
+
+
+            if(_SettingsModel.DefaultFileLocation.IsNullOrWhiteSpace().Equals(true) ||
+                    File.Exists(_SettingsModel.DefaultFileLocation).Equals(false)) 
+
+            {
+                MainPageStatus.Text = $"File {_SettingsModel.DefaultFileLocation} can't be found.";
+                return; 
+            }
+
+
+            await PassphraseLogic();
+
+            var result = await FilePicker.PickAsync();
+
+            try
+            {
+                string decrypttext = FilEncryption.DecryptFile(_SettingsModel.DefaultFileLocation, _CurrentAppSettings.Passphrase);
+
+                if (decrypttext.IsNullOrWhiteSpace())
+                {
+                    await DisplayAlert("Blank File", "The file is not encypted, blank or wrong passcode.", "OK");
+                    return;
+                }
+
+                Note.Text = FilEncryption.DecryptFile(result.FullPath, _CurrentAppSettings.Passphrase);
+
+                lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
+
+
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+            }
+
+
 
 
         }
@@ -61,6 +101,7 @@ namespace ASecureNoteMaker
 
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
+
             if (Note.Text.Length > 0)
             {
                 bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure you update has been saved.", "Yes", "No");
@@ -77,8 +118,6 @@ namespace ASecureNoteMaker
             {
                 if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                 {
-                    //bool SaveData = await DisplayAlert("Confirmation", "Want to save current text?", "Yes", "No");
-
                     var PassphraseLogicTask = PassphraseLogic();
 
                     await PassphraseLogicTask;
@@ -126,13 +165,14 @@ namespace ASecureNoteMaker
 
             //Clear out any new values if they are saved.
             ClearOutStoredValues();
+                       
+
+            var result = await FilePicker.PickAsync();
 
             await PassphraseLogic();
 
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
             { return; }
-
-            var result = await FilePicker.PickAsync();
 
             try
             {
