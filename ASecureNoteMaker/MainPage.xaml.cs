@@ -4,16 +4,14 @@ using CommunityToolkit.Maui.Storage;
 using System.Text.Json;
 
 
-
 namespace ASecureNoteMaker
 {
     public partial class MainPage : ContentPage
     {
 
         CurrentAppSettings _CurrentAppSettings = new();
-        SettingsModel _SettingsModel = new SettingsModel();
         private string _SettingsFileFullLocation = string.Empty;
-
+        SettingsModel _SettingsModel = new SettingsModel();
         private IDispatcherTimer autoSaveTimer;
 
         // Base Functions
@@ -26,6 +24,70 @@ namespace ASecureNoteMaker
             this.Loaded += OnPageLoaded;
         }
 
+        private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (e.Value)
+            {
+                // Start auto-save
+                autoSaveTimer = Dispatcher.CreateTimer();
+                autoSaveTimer.Interval = TimeSpan.FromSeconds(30);
+                autoSaveTimer.Tick += (s, e) => SaveText_ClickedAsync(this, EventArgs.Empty);
+                autoSaveTimer.Start();
+            }
+            else
+            {
+                // Stop auto-save
+                autoSaveTimer?.Stop();
+            }
+
+        }
+
+        private void AutoSaverTimerStopClear()
+        {
+            autoSaveTimer?.Stop();
+            AutoSaveCheckbox.IsChecked = false;
+        }
+
+        private void ClearOutStoredValues()
+        {
+            _CurrentAppSettings = new CurrentAppSettings();
+            MainPageStatus.Text = string.Empty;
+        }
+
+        private async void Exit_Clicked(object sender, EventArgs e)
+        {
+            bool answer = await DisplayAlert("Close Program", "Do you want to close the program?", "Yes", "No");
+
+            if (answer)
+            {
+                // Close the application
+                Application.Current.Quit();
+            }
+        }
+
+        private async void NewFile_Clicked(object sender, EventArgs e)
+        {
+            bool NewFile = false;
+
+            if (Note.Text.Length.Equals(0))
+            {
+                return;
+            }
+
+            NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file? Make sure you stuff is saved before creating a new file.", "Yes", "No");
+
+            if (NewFile)
+            {
+                ClearOutStoredValues();
+
+                MainPageStatus.Text = string.Empty;
+
+                Note.Text = string.Empty;
+
+                lblFileName.Text = $"File not saved yet.";
+            }
+        }
+
         private async void OnPageLoaded(object sender, EventArgs e)
         {
             if (File.Exists(_SettingsFileFullLocation).Equals(false))
@@ -33,7 +95,7 @@ namespace ASecureNoteMaker
                 return;
             }
 
-           
+
             string jsonString = string.Empty;
 
             jsonString = File.ReadAllText(_SettingsFileFullLocation);
@@ -41,12 +103,12 @@ namespace ASecureNoteMaker
             _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
 
-            if(_SettingsModel.DefaultFileLocation.IsNullOrWhiteSpace().Equals(true) ||
-                    File.Exists(_SettingsModel.DefaultFileLocation).Equals(false)) 
+            if (_SettingsModel.DefaultFileLocation.IsNullOrWhiteSpace().Equals(true) ||
+                    File.Exists(_SettingsModel.DefaultFileLocation).Equals(false))
 
             {
                 MainPageStatus.Text = $"File {_SettingsModel.DefaultFileLocation} can't be found.";
-                return; 
+                return;
             }
 
 
@@ -79,26 +141,6 @@ namespace ASecureNoteMaker
 
 
         }
-
-        private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
-        {
-            if (e.Value)
-            {
-                // Start auto-save
-                autoSaveTimer = Dispatcher.CreateTimer();
-                autoSaveTimer.Interval = TimeSpan.FromSeconds(30);
-                autoSaveTimer.Tick += (s, e) => SaveText_ClickedAsync(this, EventArgs.Empty);
-                autoSaveTimer.Start();
-            }
-            else
-            {
-                // Stop auto-save
-                autoSaveTimer?.Stop();
-            }
-
-        }
-
-
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
 
@@ -110,52 +152,52 @@ namespace ASecureNoteMaker
                 {
                     return;
                 }
-                
-                
-            bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
 
-            if (SaveFile.Equals(true))
-            {
-                if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+
+                bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
+
+                if (SaveFile.Equals(true))
                 {
-                    var PassphraseLogicTask = PassphraseLogic();
-
-                    await PassphraseLogicTask;
-
-                    FileSaverResult fileSaverResult;
-
-                    try
+                    if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                     {
-                        fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                        var PassphraseLogicTask = PassphraseLogic();
+
+                        await PassphraseLogicTask;
+
+                        FileSaverResult fileSaverResult;
+
+                        try
+                        {
+                            fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                        }
+                        catch (Exception ex)
+                        {
+                            DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
+                            return;
+                        }
+
+
+                        _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
+
+
+
+                        if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
+                        {
+                            DisplayAlert("File Selected", "No file is selected.", "Ok");
+                            return;
+                        }
+
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
-                        return;
+                        FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
+
+                        _CurrentAppSettings.Passphrase = string.Empty;
+
                     }
-
-
-                    _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
-
-
-
-                    if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-                    {
-                        DisplayAlert("File Selected", "No file is selected.", "Ok");
-                        return;
-                    }
-
                 }
-                else
-                {
-                    FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
 
-                    _CurrentAppSettings.Passphrase = string.Empty;
 
-                }
-            }
-
-            
 
 
             }
@@ -165,7 +207,7 @@ namespace ASecureNoteMaker
 
             //Clear out any new values if they are saved.
             ClearOutStoredValues();
-                       
+
 
             var result = await FilePicker.PickAsync();
 
@@ -218,11 +260,19 @@ namespace ASecureNoteMaker
 
             return;
         }
-
-        private void AutoSaverTimerStopClear()
+        private async void SaveText_Clicked(object sender, EventArgs e)
         {
-            autoSaveTimer?.Stop();
-            AutoSaveCheckbox.IsChecked = false;
+
+
+            // var flyout = Historymnu as MenuFlyoutSubItem;
+
+            //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
+
+            // flyout.Add(itemX);
+            //MainMenu.Add(itemX);
+
+
+            await SaveText_ClickedAsync(null, null);
         }
 
         private async Task SaveText_ClickedAsync(object sender, EventArgs e)
@@ -261,67 +311,10 @@ namespace ASecureNoteMaker
 
             return;
         }
-
-        private async void NewFile_Clicked(object sender, EventArgs e)
-        {
-            bool NewFile = false;
-
-            if (Note.Text.Length.Equals(0))
-            {
-                return;
-            }
-
-            NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file? Make sure you stuff is saved before creating a new file.", "Yes", "No");
-
-            if (NewFile)
-            {
-                ClearOutStoredValues();
-
-                MainPageStatus.Text = string.Empty;
-
-                Note.Text = string.Empty;
-
-                lblFileName.Text = $"File not saved yet.";
-            }
-        }
-
-        private async void Exit_Clicked(object sender, EventArgs e)
-        {
-            bool answer = await DisplayAlert("Close Program", "Do you want to close the program?", "Yes", "No");
-
-            if (answer)
-            {
-                // Close the application
-                Application.Current.Quit();
-            }
-        }
-
         private void Settings_Clicked(object sender, EventArgs e)
         {
             Navigation.PushAsync(new SettingsPage());
         }
-
-        private async void SaveText_Clicked(object sender, EventArgs e)
-        {
-
-
-            // var flyout = Historymnu as MenuFlyoutSubItem;
-
-            //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
-
-            // flyout.Add(itemX);
-            //MainMenu.Add(itemX);
-
-
-            await SaveText_ClickedAsync(null, null);
-        }
-
-        private void ClearOutStoredValues()
-        {
-            _CurrentAppSettings = new CurrentAppSettings();
-            MainPageStatus.Text = string.Empty;
-        }
-
     }
 
 
