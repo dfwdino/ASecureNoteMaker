@@ -53,5 +53,13 @@ namespace ASecureNoteMaker.Models
                 }
             }
         }
+
+        public void Clear()
+        {
+            Passphrase = string.Empty;
+            _fileName = string.Empty;
+            FileLocation = string.Empty;  
+        }
+
     }
 }

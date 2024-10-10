@@ -103,8 +103,7 @@ namespace ASecureNoteMaker
             _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
 
-            if (_SettingsModel.DefaultFileLocation.IsNullOrWhiteSpace().Equals(true) ||
-                    File.Exists(_SettingsModel.DefaultFileLocation).Equals(false))
+            if (File.Exists(_SettingsModel.DefaultFileLocation).Equals(false))
 
             {
                 MainPageStatus.Text = $"File {_SettingsModel.DefaultFileLocation} can't be found.";
@@ -113,8 +112,6 @@ namespace ASecureNoteMaker
 
 
             await PassphraseLogic();
-
-            var result = await FilePicker.PickAsync();
 
             try
             {
@@ -126,9 +123,11 @@ namespace ASecureNoteMaker
                     return;
                 }
 
-                Note.Text = FilEncryption.DecryptFile(result.FullPath, _CurrentAppSettings.Passphrase);
+                Note.Text = decrypttext;
 
-                lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
+                lblFileName.Text = $"Current File is " + Path.GetFileName(_SettingsModel.DefaultFileLocation);
+
+                _CurrentAppSettings.FullLocation = _SettingsModel.DefaultFileLocation;
 
 
             }
@@ -230,11 +229,15 @@ namespace ASecureNoteMaker
 
                 lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
 
+                _CurrentAppSettings.FullLocation = result.FullPath;
+
 
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+
+                _CurrentAppSettings.Clear();
             }
 
             #endregion
@@ -262,8 +265,6 @@ namespace ASecureNoteMaker
         }
         private async void SaveText_Clicked(object sender, EventArgs e)
         {
-
-
             // var flyout = Historymnu as MenuFlyoutSubItem;
 
             //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };

@@ -7,7 +7,7 @@ namespace ASecureNoteMaker;
 public partial class SettingsPage : ContentPage
 {
     SettingsModel _SettingsModel = new SettingsModel();
-    private string _SettingsFileFullLocation = string.Empty;
+    private readonly string _SettingsFileFullLocation = string.Empty;
     public SettingsPage()
 	{
 		InitializeComponent();
@@ -30,6 +30,8 @@ public partial class SettingsPage : ContentPage
     private void OnSaveButtonClicked(object sender, EventArgs e)
     {
         var options = new JsonSerializerOptions { WriteIndented = true };
+
+        _SettingsModel.DefaultFileLocation = DefaultFileLocationEntry.Text;
 
         string jsonString = JsonSerializer.Serialize(_SettingsModel, options);
 
