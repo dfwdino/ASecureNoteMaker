@@ -1,3 +1,4 @@
+using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
 using System.Text.Json;
@@ -23,6 +24,7 @@ public partial class SettingsPage : ContentPage
             _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
             DefaultFileLocationEntry.Text = _SettingsModel.DefaultFileLocation;
+            AutoSaveTimer.Text = _SettingsModel.AutoSaveTimeSeconds;
 
         }
     }
@@ -32,6 +34,7 @@ public partial class SettingsPage : ContentPage
         var options = new JsonSerializerOptions { WriteIndented = true };
 
         _SettingsModel.DefaultFileLocation = DefaultFileLocationEntry.Text;
+        _SettingsModel.AutoSaveTimeSeconds = AutoSaveTimer.Text.IsNullOrWhiteSpace() ? AutoSaveTimer.Placeholder : AutoSaveTimer.Text;
 
         string jsonString = JsonSerializer.Serialize(_SettingsModel, options);
 

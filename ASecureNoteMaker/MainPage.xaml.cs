@@ -11,7 +11,7 @@ namespace ASecureNoteMaker
 
         CurrentAppSettings _CurrentAppSettings = new();
         private string _SettingsFileFullLocation = string.Empty;
-        SettingsModel _SettingsModel = new SettingsModel();
+ 
         private IDispatcherTimer autoSaveTimer;
 
         // Base Functions
@@ -30,7 +30,7 @@ namespace ASecureNoteMaker
             {
                 // Start auto-save
                 autoSaveTimer = Dispatcher.CreateTimer();
-                autoSaveTimer.Interval = TimeSpan.FromSeconds(30);
+                autoSaveTimer.Interval = TimeSpan.FromSeconds(Convert.ToInt32(_CurrentAppSettings.Settings.AutoSaveTimeSeconds));
                 autoSaveTimer.Tick += (s, e) => SaveText_ClickedAsync(this, EventArgs.Empty);
                 autoSaveTimer.Start();
             }
@@ -100,13 +100,13 @@ namespace ASecureNoteMaker
 
             jsonString = File.ReadAllText(_SettingsFileFullLocation);
 
-            _SettingsModel = JsonSerializer.Deserialize<SettingsModel>(jsonString);
+            _CurrentAppSettings.Settings = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
 
-            if (File.Exists(_SettingsModel.DefaultFileLocation).Equals(false))
+            if (File.Exists(_CurrentAppSettings.Settings.DefaultFileLocation).Equals(false))
 
             {
-                MainPageStatus.Text = $"File {_SettingsModel.DefaultFileLocation} can't be found.";
+                MainPageStatus.Text = $"File {_CurrentAppSettings.Settings.DefaultFileLocation} can't be found.";
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace ASecureNoteMaker
 
             try
             {
-                string decrypttext = FilEncryption.DecryptFile(_SettingsModel.DefaultFileLocation, _CurrentAppSettings.Passphrase);
+                string decrypttext = FilEncryption.DecryptFile(_CurrentAppSettings.Settings.DefaultFileLocation, _CurrentAppSettings.Passphrase);
 
                 if (decrypttext.IsNullOrWhiteSpace())
                 {
@@ -125,9 +125,9 @@ namespace ASecureNoteMaker
 
                 Note.Text = decrypttext;
 
-                lblFileName.Text = $"Current File is " + Path.GetFileName(_SettingsModel.DefaultFileLocation);
+                lblFileName.Text = $"Current File is " + Path.GetFileName(_CurrentAppSettings.Settings.DefaultFileLocation);
 
-                _CurrentAppSettings.FullLocation = _SettingsModel.DefaultFileLocation;
+                _CurrentAppSettings.FullLocation = _CurrentAppSettings.Settings.DefaultFileLocation;
 
 
             }

@@ -29,12 +29,20 @@
            Clicked="OnBrowseButtonClicked" />
             </Grid>
 
+            <Label Text="Default Auto Save Time (seconds):" FontSize="Medium" VerticalOptions="Start" />
+
+            <Editor
+                x:Name="AutoSaveTimer" Placeholder="30"/>
+
+
             <Button 
                 Text="Save"
                 VerticalOptions="End"
                 HorizontalOptions="Center"
                 Clicked="OnSaveButtonClicked" />
-            
+
+
+
         </VerticalStackLayout>
         
         
