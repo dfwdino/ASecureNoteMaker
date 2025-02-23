@@ -11,7 +11,7 @@ namespace ASecureNoteMaker
 
         CurrentAppSettings _CurrentAppSettings = new();
         private string _SettingsFileFullLocation = string.Empty;
- 
+
         private IDispatcherTimer autoSaveTimer;
 
         // Base Functions
@@ -50,6 +50,7 @@ namespace ASecureNoteMaker
 
         private void ClearOutStoredValues()
         {
+            _CurrentAppSettings.Dispose();
             _CurrentAppSettings = new CurrentAppSettings();
             MainPageStatus.Text = string.Empty;
         }
@@ -60,10 +61,12 @@ namespace ASecureNoteMaker
 
             if (answer)
             {
-                // Close the application
+                //Close the application
                 Application.Current.Quit();
             }
         }
+
+
 
         private async void NewFile_Clicked(object sender, EventArgs e)
         {
@@ -142,16 +145,14 @@ namespace ASecureNoteMaker
         }
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
-
             if (Note.Text.Length > 0)
             {
-                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure you update has been saved.", "Yes", "No");
+                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure your update has been saved.", "Yes", "No");
 
                 if (NewFile.Equals(false))
                 {
                     return;
                 }
-
 
                 bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
 
@@ -167,7 +168,7 @@ namespace ASecureNoteMaker
 
                         try
                         {
-                            fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream(), CancellationToken.None);
+                            fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream());
                         }
                         catch (Exception ex)
                         {
@@ -175,45 +176,35 @@ namespace ASecureNoteMaker
                             return;
                         }
 
-
                         _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
-
-
 
                         if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
                         {
                             DisplayAlert("File Selected", "No file is selected.", "Ok");
                             return;
                         }
-
                     }
                     else
                     {
                         FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
-
-                        _CurrentAppSettings.Passphrase = string.Empty;
-
+                        _CurrentAppSettings.Clear();
                     }
                 }
-
-
-
-
             }
-
 
             #region Loading New File
 
             //Clear out any new values if they are saved.
             ClearOutStoredValues();
 
-
             var result = await FilePicker.PickAsync();
 
             await PassphraseLogic();
 
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
-            { return; }
+            {
+                return;
+            }
 
             try
             {
@@ -221,7 +212,7 @@ namespace ASecureNoteMaker
 
                 if (decrypttext.IsNullOrWhiteSpace())
                 {
-                    await DisplayAlert("Blank File", "The file is not encypted, blank or wrong passcode.", "OK");
+                    await DisplayAlert("Blank File", "The file is not encrypted, blank or wrong passcode.", "OK");
                     return;
                 }
 
@@ -230,19 +221,14 @@ namespace ASecureNoteMaker
                 lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
 
                 _CurrentAppSettings.FullLocation = result.FullPath;
-
-
             }
             catch (Exception ex)
             {
                 await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-
                 _CurrentAppSettings.Clear();
             }
 
             #endregion
-
-
 
             return;
         }
@@ -280,7 +266,6 @@ namespace ASecureNoteMaker
         {
             await PassphraseLogic();
 
-
             if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
             {
                 AutoSaverTimerStopClear();
@@ -294,7 +279,7 @@ namespace ASecureNoteMaker
 
                 if (fileSaverResult.FilePath.IsNullOrWhiteSpace())
                 {
-                    await DisplayAlert("Blank value", "No locatoin found or used.", "Ok");
+                    await DisplayAlert("Blank value", "No location found or used.", "Ok");
                     AutoSaverTimerStopClear();
                     return;
                 }

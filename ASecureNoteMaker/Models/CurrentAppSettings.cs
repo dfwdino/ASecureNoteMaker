@@ -1,44 +1,27 @@
-﻿using ASecureNoteMaker.Extensions;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace ASecureNoteMaker.Models
 {
-    
-    internal class CurrentAppSettings
+    internal class CurrentAppSettings : IDisposable
     {
-
-        #region Private Variables 
-
-        private string _defaultFileNameValue => $"TodaysFile-{DateTime.Now.ToFileTime()}.txt";
+        private const string DefaultFileNamePrefix = "TodaysFile";
         private string _fileName = string.Empty;
-       
-
-        #endregion End Private Variables
-
-
-        #region Public Variables
 
         public string Passphrase { get; set; } = string.Empty;
         public string EncryptedFilePath { get; set; } = string.Empty;
         public string FileLocation { get; set; } = string.Empty;
-
-        public SettingsModel Settings { get; set; } = new SettingsModel();
-
-        #endregion End Public Variables
-
-
+        public SettingsModel Settings { get; set; } = new();
 
         public string FileName
         {
-            get => string.IsNullOrWhiteSpace(_fileName) ? _defaultFileNameValue : _fileName;
-            set => _fileName = string.IsNullOrWhiteSpace(value) ? _defaultFileNameValue : value;
+            get => string.IsNullOrWhiteSpace(_fileName) ? GenerateDefaultFileName() : _fileName;
+            set => _fileName = string.IsNullOrWhiteSpace(value) ? GenerateDefaultFileName() : value;
         }
-
-
 
         public string FullLocation
         {
-            get => Path.Combine(FileLocation, FileName);
-
+            get => string.IsNullOrEmpty(FileLocation) ? string.Empty : Path.Combine(FileLocation, FileName);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -54,12 +37,33 @@ namespace ASecureNoteMaker.Models
             }
         }
 
-        public void Clear()
+        private static string GenerateDefaultFileName() => $"{DefaultFileNamePrefix}-{DateTime.Now.ToFileTime()}.txt";
+
+        private static void ClearValue(string value)
         {
-            Passphrase = string.Empty;
-            _fileName = string.Empty;
-            FileLocation = string.Empty;  
+            if (!string.IsNullOrEmpty(value))
+            {
+                byte[] keyBytes = Encoding.UTF8.GetBytes(value);
+                CryptographicOperations.ZeroMemory(keyBytes);
+            }
         }
 
+        public void Clear()
+        {
+            ClearValue(Passphrase);
+            ClearValue(_fileName);
+            ClearValue(FileLocation);
+
+            Passphrase = string.Empty;
+            _fileName = string.Empty;
+            FileLocation = string.Empty;
+            EncryptedFilePath = string.Empty;
+        }
+
+        public void Dispose()
+        {
+            Clear();
+            GC.SuppressFinalize(this);
+        }
     }
 }
