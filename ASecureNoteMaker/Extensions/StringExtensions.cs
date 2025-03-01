@@ -7,6 +7,11 @@
             return string.IsNullOrWhiteSpace(input);
         }
 
+        public static string RemoveText(this string input, string removetext)
+        {
+            return input.Replace(removetext, "");
+        }
+
         public static bool HasValue(this string input)
         {
             return !string.IsNullOrWhiteSpace(input);
