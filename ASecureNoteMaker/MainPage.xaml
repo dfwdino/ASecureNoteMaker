@@ -43,8 +43,8 @@
 
             <Button Text="Save" 
                  Clicked="SaveText_Clicked" 
-                 HeightRequest="50" 
-                 WidthRequest="85"/>
+                 HeightRequest="45" 
+                 WidthRequest="70"/>
 
             <CheckBox x:Name="AutoSaveCheckbox" 
                    CheckedChanged="AutoSave_CheckedChanged"
