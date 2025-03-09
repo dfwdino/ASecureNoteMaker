@@ -1,6 +1,7 @@
 ﻿using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
+using Microsoft.Maui.Controls;
 using System.Text.Json;
 
 
@@ -145,6 +146,11 @@ namespace ASecureNoteMaker
         }
         private async void OpenFile_Clicked(object sender, EventArgs e)
         {
+
+            SaveText_Clicked(null, null);
+
+            return;
+
             if (Note.Text.Length > 0)
             {
                 bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure your update has been saved.", "Yes", "No");
@@ -251,16 +257,63 @@ namespace ASecureNoteMaker
         }
         private async void SaveText_Clicked(object sender, EventArgs e)
         {
-            // var flyout = Historymnu as MenuFlyoutSubItem;
+            AddNewEntryToHistoryMenu();
 
-            //var itemX = new MenuFlyoutItem { Text = "Item X", CommandParameter = "Test",IsEnabled = true, };
-
-            // flyout.Add(itemX);
-            //MainMenu.Add(itemX);
-
-
-            await SaveText_ClickedAsync(null, null);
+            //await SaveText_ClickedAsync(null, null);
         }
+
+
+        public void AddNewEntryToHistoryMenu()
+        {
+            // Assuming you have a reference to your page
+            var fileMenu = GetMenuFlyoutSubItem("File");
+            if (fileMenu != null)
+            {
+                var historyMenu = GetSubMenu(fileMenu, "Historymnu");
+                if (historyMenu != null)
+                {
+                    var newEntry = new MenuFlyoutItem
+                    {
+                        Text = "New Entry",
+                        Command = new Command(() => { /* Your command logic here */ })
+                    };
+
+                    historyMenu.Add(newEntry);
+                }
+            }
+        }
+
+        private MenuFlyoutSubItem GetMenuFlyoutSubItem(string name)
+        {
+            var fileMenu = GetMenuFlyoutSubItem("File");
+            // Assuming 'menuItems' is a collection of IMenuElement
+            var subMenuItems = fileMenu.OfType<MenuFlyoutSubItem>();
+
+            // Now you can iterate over subMenuItems to find or add new items
+            foreach (var subMenuItem in subMenuItems)
+            {
+                if (subMenuItem.Text == "History")
+                {
+                    var newEntry = new MenuFlyoutItem
+                    {
+                        Text = "New Entry",
+                        Command = new Command(() => { /* Your command logic here */ })
+                    };
+
+                    subMenuItem.Add(newEntry);
+                }
+            }
+
+        }
+
+        private MenuFlyoutSubItem GetSubMenu(MenuFlyoutSubItem parent, string name)
+        {
+            return parent
+                .SelectMany(m => m.OfType<MenuFlyoutSubItem>())
+                .FirstOrDefault(s => s.Text == name);
+        }
+
+
 
         private async Task SaveText_ClickedAsync(object sender, EventArgs e)
         {
