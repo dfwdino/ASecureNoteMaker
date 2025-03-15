@@ -13,12 +13,9 @@
 
 
 
-            <MenuFlyoutSubItem x:Name="Historymnu" Text="History">
-
-                <MenuFlyoutItem Text="Berlin, DE"
-                                CommandParameter="Berlin"/>
+            <MenuFlyoutSubItem x:Name="Historymnu" Text="History" BindingContext="{Binding HistoryObject}">
+                            
             </MenuFlyoutSubItem>
-
             <MenuFlyoutItem Text="Exit"
                             Clicked="Exit_Clicked" />
 
@@ -59,15 +56,17 @@
        CornerRadius="5" 
        Padding="0">
 
-
-            <Editor Grid.Row="1" 
+            <ScrollView VerticalScrollBarVisibility="Always" HorizontalScrollBarVisibility="Always">
+                <Editor Grid.Row="1" 
                 x:Name="Note" 
                 Text="" 
                 IsSpellCheckEnabled="True" 
                 IsTextPredictionEnabled="True" 
                 Placeholder="Text goes here."
                 Margin="0,0,0,0"
-               BackgroundColor="Transparent"/>
+               BackgroundColor="Transparent" 
+                />
+            </ScrollView>
         </Frame>
 
 

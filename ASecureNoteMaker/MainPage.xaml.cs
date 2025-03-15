@@ -1,6 +1,7 @@
 ﻿using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
+using System.Collections.ObjectModel;
 using System.Text.Json;
 
 
@@ -14,6 +15,8 @@ namespace ASecureNoteMaker
 
         private IDispatcherTimer autoSaveTimer;
 
+        public List<string> _History = new(); 
+
         // Base Functions
         public MainPage()
         {
@@ -22,8 +25,11 @@ namespace ASecureNoteMaker
             _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
 
             this.Loaded += OnPageLoaded;
+
         }
 
+      
+               
         private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             if (e.Value)
@@ -281,9 +287,11 @@ namespace ASecureNoteMaker
                     };
 
                     subMenuItem.Add(newEntry);
+                    subMenuItem.BindingContext = "adsfas";
                 }
             }
 
+            
 
 
         }
