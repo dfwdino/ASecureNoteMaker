@@ -1,347 +1,253 @@
 ﻿using ASecureNoteMaker.Extensions;
 using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
-using System.Collections.ObjectModel;
 using System.Text.Json;
 
+namespace ASecureNoteMaker;
 
-namespace ASecureNoteMaker
+public partial class MainPage : ContentPage
 {
-    public partial class MainPage : ContentPage
+    private readonly CurrentAppSettings _currentAppSettings = new();
+    private readonly string _settingsFileFullLocation;
+    private IDispatcherTimer? _autoSaveTimer;
+    private readonly List<string> _history = new();
+
+    public MainPage()
     {
+        InitializeComponent();
+        _settingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
+        Loaded += OnPageLoaded;
+    }
 
-        CurrentAppSettings _CurrentAppSettings = new();
-        private string _SettingsFileFullLocation = string.Empty;
-
-        private IDispatcherTimer autoSaveTimer;
-
-        public List<string> _History = new(); 
-
-        // Base Functions
-        public MainPage()
+    private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
+    {
+        if (e.Value)
         {
-            InitializeComponent();
-
-            _SettingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
-
-            this.Loaded += OnPageLoaded;
-
+            _autoSaveTimer = Dispatcher.CreateTimer();
+            _autoSaveTimer.Interval = TimeSpan.FromSeconds(double.Parse(_currentAppSettings.Settings.AutoSaveTimeSeconds));
+            _autoSaveTimer.Tick += (_, _) => SaveTextAsync();
+            _autoSaveTimer.Start();
         }
-
-      
-               
-        private void AutoSave_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        else
         {
-            if (e.Value)
-            {
-                // Start auto-save
-                autoSaveTimer = Dispatcher.CreateTimer();
-                autoSaveTimer.Interval = TimeSpan.FromSeconds(Convert.ToInt32(_CurrentAppSettings.Settings.AutoSaveTimeSeconds));
-                autoSaveTimer.Tick += (s, e) => SaveText_ClickedAsync(this, EventArgs.Empty);
-                autoSaveTimer.Start();
-            }
-            else
-            {
-                // Stop auto-save
-                autoSaveTimer?.Stop();
-            }
-
-        }
-
-        private void AutoSaverTimerStopClear()
-        {
-            autoSaveTimer?.Stop();
-            AutoSaveCheckbox.IsChecked = false;
-        }
-
-        private void ClearOutStoredValues()
-        {
-            _CurrentAppSettings.Dispose();
-            _CurrentAppSettings = new CurrentAppSettings();
-            MainPageStatus.Text = string.Empty;
-        }
-
-        private async void Exit_Clicked(object sender, EventArgs e)
-        {
-            bool answer = await DisplayAlert("Close Program", "Do you want to close the program?", "Yes", "No");
-
-            if (answer)
-            {
-                //Close the application
-                Application.Current.Quit();
-            }
-        }
-
-
-        private async void NewFile_Clicked(object sender, EventArgs e)
-        {
-            bool NewFile = false;
-
-            if (Note.Text.Length.Equals(0))
-            {
-                return;
-            }
-
-            NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file? Make sure you stuff is saved before creating a new file.", "Yes", "No");
-
-            if (NewFile)
-            {
-                ClearOutStoredValues();
-
-                MainPageStatus.Text = string.Empty;
-
-                Note.Text = string.Empty;
-
-                lblFileName.Text = $"File not saved yet.";
-            }
-        }
-
-        private async void OnPageLoaded(object sender, EventArgs e)
-        {
-            if (File.Exists(_SettingsFileFullLocation).Equals(false))
-            {
-                return;
-            }
-
-
-            string jsonString = string.Empty;
-
-            jsonString = File.ReadAllText(_SettingsFileFullLocation);
-
-            _CurrentAppSettings.Settings = JsonSerializer.Deserialize<SettingsModel>(jsonString);
-
-
-            if (File.Exists(_CurrentAppSettings.Settings.DefaultFileLocation).Equals(false))
-
-            {
-                MainPageStatus.Text = $"File {_CurrentAppSettings.Settings.DefaultFileLocation} can't be found.";
-                return;
-            }
-
-
-            await PassphraseLogic();
-
-            try
-            {
-                string decrypttext = FilEncryption.DecryptFile(_CurrentAppSettings.Settings.DefaultFileLocation, _CurrentAppSettings.Passphrase);
-
-                if (decrypttext.IsNullOrWhiteSpace())
-                {
-                    await DisplayAlert("Blank File", "The file is not encypted, blank or wrong passcode.", "OK");
-                    return;
-                }
-
-                Note.Text = decrypttext;
-
-                lblFileName.Text = $"Current File is " + Path.GetFileName(_CurrentAppSettings.Settings.DefaultFileLocation);
-
-                _CurrentAppSettings.FullLocation = _CurrentAppSettings.Settings.DefaultFileLocation;
-
-
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-            }
-
-
-
-
-        }
-        private async void OpenFile_Clicked(object sender, EventArgs e)
-        {
-
-            //SaveText_Clicked(null, null); //Test the history only
-
-            if (Note.Text.Length > 0)
-            {
-                bool NewFile = await DisplayAlert("Confirmation", "Are you sure you want to start a new file?  Make sure your update has been saved.", "Yes", "No");
-
-                if (NewFile.Equals(false))
-                {
-                    return;
-                }
-
-                bool SaveFile = await DisplayAlert("Confirmation", "You want to save this file?", "Yes", "No");
-
-                if (SaveFile.Equals(true))
-                {
-                    if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace() && _CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-                    {
-                        var PassphraseLogicTask = PassphraseLogic();
-
-                        await PassphraseLogicTask;
-
-                        FileSaverResult fileSaverResult;
-
-                        try
-                        {
-                            fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream());
-                        }
-                        catch (Exception ex)
-                        {
-                            DisplayAlert("Saving File Issue", $"Can't save file b/c {ex.Message}", "OK");
-                            return;
-                        }
-
-                        _CurrentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
-
-                        if (_CurrentAppSettings.EncryptedFilePath.IsNullOrWhiteSpace())
-                        {
-                            DisplayAlert("File Selected", "No file is selected.", "Ok");
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.EncryptedFilePath, _CurrentAppSettings.Passphrase);
-                        _CurrentAppSettings.Clear();
-                    }
-                }
-            }
-
-            #region Loading New File
-
-            //Clear out any new values if they are saved.
-            ClearOutStoredValues();
-
-            var result = await FilePicker.PickAsync();
-
-            if (result is null)
-            {
-                return;
-            }
-
-            await PassphraseLogic();
-
-            if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
-            {
-                return;
-            }
-
-            try
-            {
-                string decrypttext = FilEncryption.DecryptFile(result.FullPath, _CurrentAppSettings.Passphrase);
-
-                if (decrypttext.IsNullOrWhiteSpace())
-                {
-                    await DisplayAlert("Blank File", "The file is not encrypted, blank or wrong passcode.", "OK");
-                    return;
-                }
-
-                Note.Text = FilEncryption.DecryptFile(result.FullPath, _CurrentAppSettings.Passphrase);
-
-                lblFileName.Text = $"Current File is " + Path.GetFileName(result.FullPath);
-
-                _CurrentAppSettings.FullLocation = result.FullPath;
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
-                _CurrentAppSettings.Clear();
-            }
-
-            #endregion
-
-            return;
-        }
-
-        private async Task PassphraseLogic(string filename = "")
-        {
-            if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
-            {
-                _CurrentAppSettings.Passphrase = await DisplayPromptAsync("Input", $"Please enter some text for the passphrase for the file: {filename}");
-                Task.WaitAll();
-            }
-
-            if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
-            {
-                await DisplayAlert("Blank value", "Can't have blank text in the password", "Ok");
-                Task.WaitAll();
-            }
-
-            return;
-        }
-        private async void SaveText_Clicked(object sender, EventArgs e)
-        {
-            AddNewEntryToHistoryMenu();
-
-            await SaveText_ClickedAsync(null, null);
-        }
-
-        private void AddNewEntryToHistoryMenu()
-        {
-
-            // Assuming 'menuItems' is a collection of IMenuElement
-            var subMenuItems = MainMenu.OfType<MenuFlyoutSubItem>();
-
-            // Now you can iterate over subMenuItems to find or add new items
-            foreach (var subMenuItem in subMenuItems)
-            {
-                if (subMenuItem.Text == "History")
-                {
-                    var newEntry = new MenuFlyoutItem
-                    {
-                        Text = "New Entry",
-                        Command = new Command(() => { /* Your command logic here */ })
-                    };
-
-                    subMenuItem.Add(newEntry);
-                    subMenuItem.BindingContext = "adsfas";
-                }
-            }
-
-            
-
-
-        }
-
-        private async Task SaveText_ClickedAsync(object sender, EventArgs e)
-        {
-            await PassphraseLogic();
-
-            if (_CurrentAppSettings.Passphrase.IsNullOrWhiteSpace())
-            {
-                AutoSaverTimerStopClear();
-                return;
-            }
-
-            if (_CurrentAppSettings.FileLocation.IsNullOrWhiteSpace())
-            {
-                var fileSaverResult = await FileSaver.Default.SaveAsync(_CurrentAppSettings.FileName, new MemoryStream());
-                Task.WaitAll();
-
-                if (fileSaverResult.FilePath.IsNullOrWhiteSpace())
-                {
-                    await DisplayAlert("Blank value", "No location found or used.", "Ok");
-                    AutoSaverTimerStopClear();
-                    return;
-                }
-                else
-                {
-                    _CurrentAppSettings.FullLocation = fileSaverResult.FilePath;
-                }
-            }
-
-            FilEncryption.EncryptFile(Note.Text, _CurrentAppSettings.FullLocation, _CurrentAppSettings.Passphrase);
-
-            MainPageStatus.Text = $"Note Saved in {_CurrentAppSettings.FullLocation} at {DateTime.Now}";
-
-            lblFileName.Text = $"Current File is " + Path.GetFileName(_CurrentAppSettings.FullLocation);
-
-            return;
-        }
-        private void Settings_Clicked(object sender, EventArgs e)
-        {
-            Navigation.PushAsync(new SettingsPage());
+            _autoSaveTimer?.Stop();
         }
     }
 
+    private void StopAndClearAutoSaveTimer()
+    {
+        _autoSaveTimer?.Stop();
+        AutoSaveCheckbox.IsChecked = false;
+    }
 
+    private void ResetAppState()
+    {
+        _currentAppSettings.Dispose();
+        _currentAppSettings.Clear();
+        MainPageStatus.Text = string.Empty;
+        Note.Text = string.Empty;
+        lblFileName.Text = "File not saved yet.";
+    }
 
+    private async void Exit_Clicked(object sender, EventArgs e)
+    {
+        if (await DisplayAlert("Close Program", "Do you want to close the program?", "Yes", "No"))
+        {
+            Application.Current?.Quit();
+        }
+    }
 
+    private async void NewFile_Clicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(Note.Text))
+        {
+            return;
+        }
 
+        if (await DisplayAlert("Confirmation", "Are you sure you want to start a new file? Make sure your content is saved.", "Yes", "No"))
+        {
+            ResetAppState();
+        }
+    }
 
+    private async void OnPageLoaded(object? sender, EventArgs e)
+    {
+        if (!File.Exists(_settingsFileFullLocation))
+        {
+            return;
+        }
 
+        string jsonString = await File.ReadAllTextAsync(_settingsFileFullLocation);
+        _currentAppSettings.Settings = JsonSerializer.Deserialize<SettingsModel>(jsonString);
 
+        if (!File.Exists(_currentAppSettings.Settings.DefaultFileLocation))
+        {
+            MainPageStatus.Text = $"File {_currentAppSettings.Settings.DefaultFileLocation} can't be found.";
+            return;
+        }
+
+        await SetPassphraseAsync();
+
+        try
+        {
+            string decryptedText = FilEncryption.DecryptFile(_currentAppSettings.Settings.DefaultFileLocation, _currentAppSettings.Passphrase);
+            if (string.IsNullOrWhiteSpace(decryptedText))
+            {
+                await DisplayAlert("Blank File", "The file is not encrypted, blank, or the passcode is incorrect.", "OK");
+                return;
+            }
+
+            Note.Text = decryptedText;
+            lblFileName.Text = $"Current File: {Path.GetFileName(_currentAppSettings.Settings.DefaultFileLocation)}";
+            _currentAppSettings.FullLocation = _currentAppSettings.Settings.DefaultFileLocation;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+        }
+    }
+
+    private async void OpenFile_Clicked(object sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(Note.Text))
+        {
+            bool newFile = await DisplayAlert("Confirmation", "Are you sure you want to open a new file? Make sure your updates have been saved.", "Yes", "No");
+            if (!newFile)
+            {
+                return;
+            }
+
+            if (await DisplayAlert("Confirmation", "Do you want to save this file?", "Yes", "No"))
+            {
+                await SaveCurrentFileAsync();
+            }
+        }
+
+        ResetAppState();
+        var result = await FilePicker.PickAsync();
+        if (result is null)
+        {
+            return;
+        }
+
+        await SetPassphraseAsync();
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.Passphrase))
+        {
+            return;
+        }
+
+        try
+        {
+            string decryptedText = FilEncryption.DecryptFile(result.FullPath, _currentAppSettings.Passphrase);
+            if (string.IsNullOrWhiteSpace(decryptedText))
+            {
+                await DisplayAlert("Blank File", "The file is not encrypted, blank, or the passcode is incorrect.", "OK");
+                return;
+            }
+
+            Note.Text = decryptedText;
+            lblFileName.Text = $"Current File: {Path.GetFileName(result.FullPath)}";
+            _currentAppSettings.FullLocation = result.FullPath;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+            _currentAppSettings.Clear();
+        }
+    }
+
+    private async Task SetPassphraseAsync(string filename = "")
+    {
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.Passphrase))
+        {
+            _currentAppSettings.Passphrase = await DisplayPromptAsync("Input", $"Please enter the passphrase for the file: {filename}");
+        }
+
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.Passphrase))
+        {
+            await DisplayAlert("Blank value", "The passphrase cannot be blank", "Ok");
+        }
+    }
+
+    private async void SaveText_Clicked(object sender, EventArgs e)
+    {
+        AddNewEntryToHistoryMenu();
+        await SaveTextAsync();
+    }
+
+    private void AddNewEntryToHistoryMenu()
+    {
+        var historySubMenu = MainMenu.OfType<MenuFlyoutSubItem>().FirstOrDefault(item => item.Text == "History");
+        if (historySubMenu != null)
+        {
+            var newEntry = new MenuFlyoutItem
+            {
+                Text = "New Entry",
+                Command = new Command(() => { /* Your command logic here */ })
+            };
+            historySubMenu.Add(newEntry);
+        }
+    }
+
+    private async Task SaveTextAsync()
+    {
+        await SetPassphraseAsync();
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.Passphrase))
+        {
+            StopAndClearAutoSaveTimer();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.FileLocation))
+        {
+            var fileSaverResult = await FileSaver.Default.SaveAsync(_currentAppSettings.FileName, Stream.Null);
+
+            if (string.IsNullOrWhiteSpace(fileSaverResult.FilePath))
+            {
+                await DisplayAlert("Blank value", "No location found or used.", "Ok");
+                StopAndClearAutoSaveTimer();
+                return;
+            }
+
+            _currentAppSettings.FullLocation = fileSaverResult.FilePath;
+        }
+
+        FilEncryption.EncryptFile(Note.Text, _currentAppSettings.FullLocation, _currentAppSettings.Passphrase);
+        MainPageStatus.Text = $"Note Saved in {_currentAppSettings.FullLocation} at {DateTime.Now}";
+        lblFileName.Text = $"Current File: {Path.GetFileName(_currentAppSettings.FullLocation)}";
+    }
+
+    private async Task SaveCurrentFileAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_currentAppSettings.Passphrase) && string.IsNullOrWhiteSpace(_currentAppSettings.EncryptedFilePath))
+        {
+            await SetPassphraseAsync();
+
+            try
+            {
+                var fileSaverResult = await FileSaver.Default.SaveAsync(_currentAppSettings.FileName, Stream.Null);
+                _currentAppSettings.EncryptedFilePath = fileSaverResult.FilePath;
+                if (string.IsNullOrWhiteSpace(_currentAppSettings.EncryptedFilePath))
+                {
+                    await DisplayAlert("File Selected", "No file is selected.", "Ok");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Saving File Issue", $"Can't save file: {ex.Message}", "OK");
+                return;
+            }
+        }
+        else
+        {
+            FilEncryption.EncryptFile(Note.Text, _currentAppSettings.EncryptedFilePath, _currentAppSettings.Passphrase);
+            _currentAppSettings.Clear();
+        }
+    }
+
+    private void Settings_Clicked(object sender, EventArgs e)
+    {
+        Navigation.PushAsync(new SettingsPage());
+    }
 }

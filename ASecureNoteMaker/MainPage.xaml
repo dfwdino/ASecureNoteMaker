@@ -1,81 +1,78 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ASecureNoteMaker.MainPage" >
+             x:Class="ASecureNoteMaker.MainPage" 
+             Title="A Secure Note Maker">
 
     <ContentPage.MenuBarItems>
         <MenuBarItem x:Name="MainMenu" Text="File">
             <MenuFlyoutItem Text="New File"
                             Clicked="NewFile_Clicked" />
-
             <MenuFlyoutItem Text="Open File"
                             Clicked="OpenFile_Clicked" />
-
-
-
             <MenuFlyoutSubItem x:Name="Historymnu" Text="History" BindingContext="{Binding HistoryObject}">
-                            
             </MenuFlyoutSubItem>
             <MenuFlyoutItem Text="Exit"
                             Clicked="Exit_Clicked" />
-
-
         </MenuBarItem>
 
         <MenuBarItem Text="Options">
             <MenuFlyoutItem Text="Settings"
                             Clicked="Settings_Clicked" />
-
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
-    <Grid RowDefinitions="30, *, Auto, Auto" Padding="10" RowSpacing="10">
+    <Grid RowDefinitions="Auto, *, Auto, Auto" Padding="10" RowSpacing="10">
 
-        <HorizontalStackLayout Grid.Row="0" Grid.Column="0">
-            <Label x:Name="lblFileName" Text="" Margin="10,0" />
-
+        <!-- Header Section -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="10">
+            <Label x:Name="lblFileName" 
+                   Text="" 
+                   FontSize="16" 
+                   VerticalOptions="Center" />
         </HorizontalStackLayout>
 
-        <HorizontalStackLayout Grid.Row="0" Grid.Column="1" HorizontalOptions="Center">
-
-            <Button Text="Save" 
-                 Clicked="SaveText_Clicked" 
-                 HeightRequest="45" 
-                 WidthRequest="70"/>
-
-            <CheckBox x:Name="AutoSaveCheckbox" 
-                   CheckedChanged="AutoSave_CheckedChanged"
-                   Margin="10,0,0,0"/>
-
-            <Label Text="AutoSave" VerticalOptions="Center"/>
-
+        <!-- Save and AutoSave Controls -->
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
+            <Button Text="Save"
+                    Clicked="SaveText_Clicked"
+                    BackgroundColor="#6200ea"
+                    TextColor="White"
+                    HeightRequest="45"
+                    WidthRequest="90"
+                    CornerRadius="10"
+                    Margin="0,0,10,0"/>
+            <CheckBox x:Name="AutoSaveCheckbox"
+                      CheckedChanged="AutoSave_CheckedChanged"
+                      VerticalOptions="Center"/>
+            <Label Text="AutoSave"
+                   VerticalOptions="Center"/>
         </HorizontalStackLayout>
-        <Frame Grid.Row="1" 
-       Margin="10" 
-       BorderColor="Gray" 
-       CornerRadius="5" 
-       Padding="0">
 
-            <ScrollView VerticalScrollBarVisibility="Always" HorizontalScrollBarVisibility="Always">
-                <Editor Grid.Row="1" 
-                x:Name="Note" 
-                Text="" 
-                IsSpellCheckEnabled="True" 
-                IsTextPredictionEnabled="True" 
-                Placeholder="Text goes here."
-                Margin="0,0,0,0"
-               BackgroundColor="Transparent" 
-                />
+        <!-- Editor Section -->
+        <Frame Grid.Row="1"
+               Margin="10"
+               BorderColor="#d3d3d3"
+               CornerRadius="8"
+               BackgroundColor="#f7f7f7">
+            <ScrollView VerticalScrollBarVisibility="Always">
+                <Editor x:Name="Note"
+                        Placeholder="Type your secure note here..."
+                        FontSize="16"
+                        Text=""
+                        IsSpellCheckEnabled="True"
+                        IsTextPredictionEnabled="True"
+                        BackgroundColor="#ffffff"
+                        Margin="5,5,5,5"/>
             </ScrollView>
         </Frame>
 
-
-
-        <Label Grid.Row="3" 
-               x:Name="MainPageStatus" 
-               Text="" 
-               HorizontalOptions="Center" 
-               VerticalOptions="End" />
+        <!-- Status Message -->
+        <Label Grid.Row="3"
+               x:Name="MainPageStatus"
+               Text=""
+               FontSize="14"
+               HorizontalOptions="CenterAndExpand"
+               VerticalOptions="EndAndExpand"/>
     </Grid>
-
 </ContentPage>
