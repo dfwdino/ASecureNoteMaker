@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ASecureNoteMaker.MainPage" 
-             Title="A Secure Note Maker">
+             x:Class="ASecureNoteMaker.MainPage">
 
     <ContentPage.MenuBarItems>
         <MenuBarItem x:Name="MainMenu" Text="File">
@@ -10,7 +9,8 @@
                             Clicked="NewFile_Clicked" />
             <MenuFlyoutItem Text="Open File"
                             Clicked="OpenFile_Clicked" />
-            <MenuFlyoutSubItem x:Name="Historymnu" Text="History" BindingContext="{Binding HistoryObject}">
+            <MenuFlyoutSubItem x:Name="Historymnu" Text="History" 
+                               BindingContext="{Binding Path=BindingContext}">
             </MenuFlyoutSubItem>
             <MenuFlyoutItem Text="Exit"
                             Clicked="Exit_Clicked" />

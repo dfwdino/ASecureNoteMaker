@@ -1,5 +1,4 @@
-﻿using ASecureNoteMaker.Extensions;
-using ASecureNoteMaker.Models;
+﻿using ASecureNoteMaker.Models;
 using CommunityToolkit.Maui.Storage;
 using System.Text.Json;
 
@@ -10,11 +9,11 @@ public partial class MainPage : ContentPage
     private readonly CurrentAppSettings _currentAppSettings = new();
     private readonly string _settingsFileFullLocation;
     private IDispatcherTimer? _autoSaveTimer;
-    private readonly List<string> _history = new();
 
     public MainPage()
     {
         InitializeComponent();
+
         _settingsFileFullLocation = Path.Combine(FileSystem.AppDataDirectory, "Settings.json");
         Loaded += OnPageLoaded;
     }
@@ -180,12 +179,7 @@ public partial class MainPage : ContentPage
         var historySubMenu = MainMenu.OfType<MenuFlyoutSubItem>().FirstOrDefault(item => item.Text == "History");
         if (historySubMenu != null)
         {
-            var newEntry = new MenuFlyoutItem
-            {
-                Text = "New Entry",
-                Command = new Command(() => { /* Your command logic here */ })
-            };
-            historySubMenu.Add(newEntry);
+            historySubMenu.Add(new MenuItem { Text = "ads" });
         }
     }
 
