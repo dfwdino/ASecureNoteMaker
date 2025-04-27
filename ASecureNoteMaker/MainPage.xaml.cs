@@ -177,16 +177,16 @@ public partial class MainPage : ContentPage
 
     private void AddNewEntryToHistoryMenu()
     {
-        var historySubMenu = MainMenu.OfType<MenuFlyoutSubItem>().FirstOrDefault(item => item.Text == "History");
-        if (historySubMenu != null)
-        {
-            var newEntry = new MenuFlyoutItem
-            {
-                Text = "New Entry",
-                Command = new Command(() => { /* Your command logic here */ })
-            };
-            historySubMenu.Add(newEntry);
-        }
+        //var historySubMenu = MainMenu.OfType<MenuFlyoutSubItem>().FirstOrDefault(item => item.Text == "History");
+        //if (historySubMenu != null)
+        //{
+        //    var newEntry = new MenuFlyoutItem
+        //    {
+        //        Text = "New Entry",
+        //        Command = new Command(() => { /* Your command logic here */ })
+        //    };
+        //    historySubMenu.Add(newEntry);
+        //}
     }
 
     private async Task SaveTextAsync()
