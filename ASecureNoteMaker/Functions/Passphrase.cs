@@ -1,7 +1,1 @@
-﻿namespace ASecureNoteMaker.Extions
-{
-    internal class Passphrase
-    {
-
-    }
-}
+// This file is intentionally empty — passphrase logic is handled in PassphrasePromptPage.

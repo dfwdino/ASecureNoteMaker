@@ -17,6 +17,7 @@ namespace ASecureNoteMaker.Models
       
 
         public string DefaultFileLocation { get; set; } = string.Empty;
+        public List<string> RecentFiles { get; set; } = new();
         public string AutoSaveTimeSeconds {
 
             get => _AutoSaveTimeSeconds; 

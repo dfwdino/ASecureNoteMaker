@@ -174,11 +174,10 @@
                BackgroundColor="{StaticResource SurfaceColor}"
                Padding="16,10">
             <Grid ColumnDefinitions="Auto, *, Auto">
-                <Image Grid.Column="0"
-                      Source="lock.png"
-                      WidthRequest="18"
-                      HeightRequest="18"
-                      VerticalOptions="Center"/>
+                <Label Grid.Column="0"
+                       Text="&#128274;"
+                       FontSize="16"
+                       VerticalOptions="Center"/>
 
                 <Label Grid.Column="1"
                       x:Name="MainPageStatus"

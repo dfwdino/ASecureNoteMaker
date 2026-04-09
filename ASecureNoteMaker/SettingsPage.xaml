@@ -3,52 +3,109 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ASecureNoteMaker.SettingsPage"
              Title="Settings"
+             BackgroundColor="#f5f7fa"
              Loaded="ContentPage_Loaded">
-    <VerticalStackLayout>
-        <Label 
-            Text="Settings"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
 
-        
-        
-        <VerticalStackLayout Spacing="10" Padding="20" VerticalOptions="FillAndExpand">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20" MaximumWidthRequest="600" HorizontalOptions="Fill">
 
-            <Label Text="Default File Location:" FontSize="Medium" VerticalOptions="Start" />
+            <!-- Page Header -->
+            <Label Text="Settings"
+                   FontSize="26"
+                   FontAttributes="Bold"
+                   TextColor="#1e293b"
+                   Margin="0,8,0,0" />
 
-            <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,10">
-                <Entry Grid.Column="0"
-           x:Name="DefaultFileLocationEntry"
-           Placeholder="Enter default file location"
-           VerticalOptions="Start" />
-                
-                <Button 
-           Grid.Column="1"
-           Text="Browse"
-           VerticalOptions="Start"
-           Clicked="OnBrowseButtonClicked" />
-            </Grid>
+            <!-- Default File Location Card -->
+            <Border Stroke="#e2e8f0"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Default File Location"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#1e293b" />
+                    <Label Text="The file that opens automatically when the app starts."
+                           FontSize="13"
+                           TextColor="#64748b" />
 
-            <Label Text="Default Auto Save Time (seconds):" FontSize="Medium" VerticalOptions="Start" />
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10" Margin="0,4,0,0">
+                        <Border Grid.Column="0"
+                                Stroke="#e2e8f0"
+                                StrokeThickness="1"
+                                BackgroundColor="#f8fafc"
+                                Padding="4,0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Entry x:Name="DefaultFileLocationEntry"
+                                   Placeholder="No default file set"
+                                   PlaceholderColor="#94a3b8"
+                                   TextColor="#1e293b"
+                                   BackgroundColor="Transparent" />
+                        </Border>
 
-            <Editor
-                x:Name="AutoSaveTimer" Placeholder="30"/>
+                        <Button Grid.Column="1"
+                                Text="Browse"
+                                BackgroundColor="#4f46e5"
+                                TextColor="White"
+                                CornerRadius="8"
+                                Padding="16,0"
+                                MinimumHeightRequest="44"
+                                Clicked="OnBrowseButtonClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
 
+            <!-- Auto-Save Card -->
+            <Border Stroke="#e2e8f0"
+                    StrokeThickness="1"
+                    BackgroundColor="White"
+                    Padding="20">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Auto-Save Interval"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#1e293b" />
+                    <Label Text="How often to auto-save when Auto-Save is enabled (in seconds)."
+                           FontSize="13"
+                           TextColor="#64748b" />
 
-            <Button 
-                Text="Save"
-                VerticalOptions="End"
-                HorizontalOptions="Center"
-                Clicked="OnSaveButtonClicked" />
+                    <Border Stroke="#e2e8f0"
+                            StrokeThickness="1"
+                            BackgroundColor="#f8fafc"
+                            Padding="4,0"
+                            Margin="0,4,0,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Entry x:Name="AutoSaveTimer"
+                               Placeholder="30"
+                               PlaceholderColor="#94a3b8"
+                               TextColor="#1e293b"
+                               Keyboard="Numeric"
+                               BackgroundColor="Transparent"
+                               TextChanged="OnAutoSaveTimerTextChanged" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
 
-
+            <!-- Save Button -->
+            <Button Text="Save Settings"
+                    BackgroundColor="#4f46e5"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="8"
+                    MinimumHeightRequest="48"
+                    Clicked="OnSaveButtonClicked" />
 
         </VerticalStackLayout>
-        
-        
-    </VerticalStackLayout>
-    
-    
-    
-    
+    </ScrollView>
 </ContentPage>
