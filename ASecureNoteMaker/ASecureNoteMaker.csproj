@@ -42,6 +42,7 @@
 		<Title>A Secure Note Maker</Title>
 		<AssemblyVersion>1.2025.04.26</AssemblyVersion>
 		<FileVersion>0.2025.02.23.*</FileVersion>
+		<AssemblyTitle>Secure Note Maker</AssemblyTitle>
 		
 	</PropertyGroup>
 

@@ -5,17 +5,22 @@ namespace ASecureNoteMaker
     public partial class AppShell : Shell
     {
         // Get the current version number
-        string version = VersionTracking.CurrentVersion;
+        //string version = VersionTracking.CurrentVersion;
 
-        // Get the current build number
-        string build = VersionTracking.CurrentBuild;
+        //// Get the current build number
+        //string build = VersionTracking.CurrentBuild;
 
-        string appVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
         public AppShell()
         {
             InitializeComponent();
 
-            this.Title = $"{Assembly.GetExecutingAssembly().GetName().Name} - {appVersion}";
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            string? appVersion = assembly?.GetName()?.Version?.ToString();
+            
+            var TitleAttribute = assembly?.GetCustomAttribute<AssemblyTitleAttribute>();
+
+            this.Title = $"{(TitleAttribute == null ? Assembly.GetExecutingAssembly().GetName().Name : TitleAttribute.Title)} - {appVersion}";
         }
 
 
