@@ -24,9 +24,9 @@ jobs:
     - name: Install MAUI Android workload
       run: dotnet workload install maui-android
     - name: Restore dependencies
-      run: dotnet restore -f net10.0-android
+      run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -f net10.0-android
     - name: Build Android
-      run: dotnet build -f net10.0-android --no-restore
+      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -f net10.0-android --no-restore
 
   build-ios:
     runs-on: macos-latest
@@ -39,6 +39,6 @@ jobs:
     - name: Install MAUI iOS workload
       run: dotnet workload install maui-ios
     - name: Restore dependencies
-      run: dotnet restore -f net10.0-ios
+      run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -f net10.0-ios
     - name: Build iOS
-      run: dotnet build -f net10.0-ios --no-restore
+      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -f net10.0-ios --no-restore
