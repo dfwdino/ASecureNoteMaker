@@ -46,7 +46,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 -r win-x64
     - name: Build Windows
-      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 -r win-x64 --no-restore -c Release
+      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 -r win-x64 -p:PublishReadyToRun=false --no-restore -c Release
     - name: Zip Windows build
       run: Compress-Archive -Path ASecureNoteMaker/bin/Release/net10.0-windows10.0.19041.0/* -DestinationPath windows-app.zip
     - name: Upload Windows build
