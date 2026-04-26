@@ -47,11 +47,40 @@ jobs:
       run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0
     - name: Build Windows
       run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 --no-restore -c Release
+    - name: Zip Windows build
+      run: Compress-Archive -Path ASecureNoteMaker/bin/Release/net10.0-windows10.0.19041.0/* -DestinationPath windows-app.zip
     - name: Upload Windows build
       uses: actions/upload-artifact@v4
       with:
         name: windows-app
-        path: ASecureNoteMaker/bin/Release/net10.0-windows10.0.19041.0/
+        path: windows-app.zip
+
+  release:
+    needs: [build-android, build-windows]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+    - name: Download Android APK
+      uses: actions/download-artifact@v4
+      with:
+        name: android-apk
+        path: artifacts/android
+    - name: Download Windows build
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-app
+        path: artifacts/windows
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: build-${{ github.run_number }}
+        name: Build ${{ github.run_number }}
+        body: "Automated release from commit ${{ github.sha }}"
+        files: |
+          artifacts/android/*.apk
+          artifacts/windows/windows-app.zip
 
   # iOS build requires Xcode 26.3 but GitHub runners only have 16.4 — re-enable when runners are updated
   # build-ios:
