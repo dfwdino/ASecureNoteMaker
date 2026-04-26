@@ -204,23 +204,29 @@ public partial class MainPage : ContentPage
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_currentAppSettings.FileLocation))
-        {
-            var fileSaverResult = await FileSaver.Default.SaveAsync(_currentAppSettings.FileName, Stream.Null);
-
-            if (string.IsNullOrWhiteSpace(fileSaverResult.FilePath))
-            {
-                await DisplayAlert("No Location", "Please choose a file location to save to.", "OK");
-                StopAndClearAutoSaveTimer();
-                return;
-            }
-
-            _currentAppSettings.FullLocation = fileSaverResult.FilePath;
-        }
-
         try
         {
-            FilEncryption.EncryptFile(Note.Text, _currentAppSettings.FullLocation, _currentAppSettings.Passphrase);
+            using var encryptedStream = FilEncryption.EncryptToStream(Note.Text, _currentAppSettings.Passphrase);
+
+            if (string.IsNullOrWhiteSpace(_currentAppSettings.FileLocation))
+            {
+                var fileSaverResult = await FileSaver.Default.SaveAsync(_currentAppSettings.FileName, encryptedStream);
+
+                if (string.IsNullOrWhiteSpace(fileSaverResult.FilePath))
+                {
+                    await DisplayAlert("No Location", "Please choose a file location to save to.", "OK");
+                    StopAndClearAutoSaveTimer();
+                    return;
+                }
+
+                _currentAppSettings.FullLocation = fileSaverResult.FilePath;
+            }
+            else
+            {
+                using var fs = new FileStream(_currentAppSettings.FullLocation, FileMode.Create, FileAccess.Write);
+                encryptedStream.CopyTo(fs);
+            }
+
             lblFileName.Text = Path.GetFileName(_currentAppSettings.FullLocation);
             SetStatus($"Saved: {Path.GetFileName(_currentAppSettings.FullLocation)}");
             LastSavedTime.Text = $"Last saved {DateTime.Now:HH:mm:ss}";

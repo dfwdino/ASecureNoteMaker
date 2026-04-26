@@ -5,7 +5,8 @@
              Title=""
              BackgroundColor="#80000000">
 
-    <Grid>
+    <ScrollView>
+    <Grid MinimumHeightRequest="500">
         <!-- Modal card centered on screen -->
         <Border HorizontalOptions="Center"
                 VerticalOptions="Center"
@@ -96,4 +97,5 @@
             </VerticalStackLayout>
         </Border>
     </Grid>
+    </ScrollView>
 </ContentPage>

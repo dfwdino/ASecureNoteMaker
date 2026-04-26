@@ -40,8 +40,8 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<Title>A Secure Note Maker</Title>
-		<AssemblyVersion>1.2026.04.09</AssemblyVersion>
-		<FileVersion>1.2026.04.09.*</FileVersion>
+		<AssemblyVersion>1.2026.04.26</AssemblyVersion>
+		<FileVersion>1.2026.04.26.*</FileVersion>
 		<AssemblyTitle>Secure Note Maker</AssemblyTitle>
 		<AndroidFastDeployment>false</AndroidFastDeployment>
 		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>

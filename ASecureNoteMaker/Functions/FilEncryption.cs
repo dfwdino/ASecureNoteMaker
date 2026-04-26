@@ -3,29 +3,29 @@ using System.Text;
 
 public class FilEncryption
 {
+    public static Stream EncryptToStream(string text, string passphrase)
+    {
+        using var aes = Aes.Create();
+        byte[] salt = GenerateSalt();
+        var key = DeriveKeyAndIV(passphrase, salt, aes.KeySize / 8, aes.BlockSize / 8);
+        aes.Key = key.Key;
+        aes.IV = key.IV;
+
+        var output = new MemoryStream();
+        output.Write(salt, 0, salt.Length);
+        using (var cryptoStream = new CryptoStream(output, aes.CreateEncryptor(), CryptoStreamMode.Write, leaveOpen: true))
+        {
+            cryptoStream.Write(Encoding.UTF8.GetBytes(text));
+        }
+        output.Position = 0;
+        return output;
+    }
+
     public static void EncryptFile(string text, string outputFilePath, string passphrase)
     {
-        // Generate key and IV from the passphrase
-        using (var aes = Aes.Create())
-        {
-            byte[] salt = GenerateSalt();
-            var key = DeriveKeyAndIV(passphrase, salt, aes.KeySize / 8, aes.BlockSize / 8);
-
-            aes.Key = key.Key;
-            aes.IV = key.IV;
-
-            using (var fsInput = new MemoryStream(Encoding.UTF8.GetBytes(text)))
-            using (var fsEncrypted = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
-            {
-                // Write the salt to the output file
-                fsEncrypted.Write(salt, 0, salt.Length);
-
-                using (var cryptoStream = new CryptoStream(fsEncrypted, aes.CreateEncryptor(), CryptoStreamMode.Write))
-                {
-                    fsInput.CopyTo(cryptoStream);
-                }
-            }
-        }
+        using var stream = EncryptToStream(text, passphrase);
+        using var fsEncrypted = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write);
+        stream.CopyTo(fsEncrypted);
     }
 
     public static string DecryptFile(string inputFilePath, string passphrase)

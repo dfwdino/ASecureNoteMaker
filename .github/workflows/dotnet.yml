@@ -23,7 +23,7 @@ jobs:
     - name: Extract version from csproj
       id: extract
       run: |
-        VERSION=$(grep -oP '(?<=<ApplicationDisplayVersion>)[^<]+' ASecureNoteMaker/ASecureNoteMaker.csproj)
+        VERSION=$(grep -oP '(?<=<AssemblyVersion>)[^<]+' ASecureNoteMaker/ASecureNoteMaker.csproj)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "App version: $VERSION"
 
