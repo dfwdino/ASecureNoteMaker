@@ -91,13 +91,32 @@
     </ContentPage.MenuBarItems>
 
     <!-- Main Layout -->
-    <Grid RowDefinitions="Auto, *, Auto" 
-         RowSpacing="10" 
-         Padding="15" 
+    <Grid RowDefinitions="Auto, Auto, *, Auto"
+         RowSpacing="10"
+         Padding="15"
          BackgroundColor="{StaticResource BackgroundColor}">
 
+        <!-- Mobile Navigation Bar (Windows uses the MenuBar above instead) -->
+        <HorizontalStackLayout Grid.Row="0"
+                               IsVisible="{OnPlatform Default=True, WinUI=False}"
+                               Spacing="8"
+                               Padding="0,0,0,4">
+            <Button Text="New"
+                    Clicked="NewFile_Clicked"
+                    Style="{StaticResource SecondaryButton}"
+                    MinimumWidthRequest="80" />
+            <Button Text="Open File"
+                    Clicked="OpenFile_Clicked"
+                    Style="{StaticResource PrimaryButton}"
+                    MinimumWidthRequest="100" />
+            <Button Text="Settings"
+                    Clicked="Settings_Clicked"
+                    Style="{StaticResource SecondaryButton}"
+                    MinimumWidthRequest="80" />
+        </HorizontalStackLayout>
+
         <!-- Header Section -->
-        <Border Grid.Row="0" 
+        <Border Grid.Row="1"
         Style="{StaticResource CardFrame}"
         Margin="0,0,0,0">
             <Grid ColumnDefinitions="*, Auto">
@@ -147,7 +166,7 @@
         </Border>
 
         <!-- Editor Section -->
-        <Border Grid.Row="1"
+        <Border Grid.Row="2"
         Style="{StaticResource CardFrame}">
             <Grid RowDefinitions="*">
                 <!-- Editor -->
@@ -167,7 +186,7 @@
         </Border>
 
         <!-- Status Bar -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                StrokeShape="RoundRectangle 8"
                StrokeThickness="1"
                Stroke="{StaticResource BorderColor}"
