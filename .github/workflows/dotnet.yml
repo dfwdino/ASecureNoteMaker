@@ -26,7 +26,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-android
     - name: Build Android
-      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-android --no-restore
+      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-android --no-restore -c Release
+    - name: Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: ASecureNoteMaker/bin/Release/net10.0-android/*.apk
 
   build-windows:
     runs-on: windows-latest
@@ -41,7 +46,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0
     - name: Build Windows
-      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 --no-restore
+      run: dotnet build ASecureNoteMaker/ASecureNoteMaker.csproj -p:TargetFramework=net10.0-windows10.0.19041.0 --no-restore -c Release
+    - name: Upload Windows build
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-app
+        path: ASecureNoteMaker/bin/Release/net10.0-windows10.0.19041.0/
 
   # iOS build requires Xcode 26.3 but GitHub runners only have 16.4 — re-enable when runners are updated
   # build-ios:
